@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Next.js build & cache
+.next/
+*/.next/
+out/
+build/
+dist/
+
+# Môi trường & Logs
+.env
+.env*.local
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
