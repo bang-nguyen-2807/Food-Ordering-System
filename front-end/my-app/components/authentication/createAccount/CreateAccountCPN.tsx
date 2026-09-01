@@ -98,9 +98,9 @@ export default function CreateAccountCPN({
   // Nếu đăng ký thành công -> hiển thị màn hình chúc mừng
   if (isSuccess) {
     return (
-      <div className="py-8 text-center animate-in fade-in zoom-in-95 duration-200">
-        <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-500 border border-emerald-100 flex items-center justify-center mx-auto mb-4 shadow-sm">
-          <CheckCircle2 className="w-9 h-9" />
+      <div className="w-full text-center py-6 animate-in fade-in duration-300">
+        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 className="w-8 h-8" />
         </div>
         <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight">
           Đăng Ký Thành Công! 🎉
@@ -178,166 +178,145 @@ export default function CreateAccountCPN({
 
       {/* Form Đăng ký */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Họ và Tên */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-            Họ và tên
-          </label>
+        {/* FullName */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-700">Họ và Tên</label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-              <User className="w-4 h-4" />
-            </div>
+            <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               required
-              placeholder="VD: Nguyễn Văn A"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
+              placeholder="Nguyễn Văn A"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* Tên đăng nhập & Số điện thoại (2 cột) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-              Tên đăng nhập
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <AtSign className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                required
-                placeholder="VD: nguyenana"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
-              />
-            </div>
+        {/* Username */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-700">Tên Đăng Nhập</label>
+          <div className="relative">
+            <AtSign className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="username123"
+              className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
+            />
           </div>
+        </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-              Số điện thoại
-            </label>
+        {/* Phone & Email Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700">Số Điện Thoại</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <Phone className="w-4 h-4" />
-              </div>
+              <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="tel"
                 required
-                placeholder="VD: 0901234567"
                 value={numberPhone}
                 onChange={(e) => setNumberPhone(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
+                placeholder="0912345678"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700">Email</label>
+            <div className="relative">
+              <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@gmail.com"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
               />
             </div>
           </div>
         </div>
 
-        {/* Email */}
-        <div>
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-            Email
-          </label>
+        {/* Password */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-700">Mật Khẩu</label>
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-              <Mail className="w-4 h-4" />
-            </div>
+            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
-              type="email"
+              type={showPassword ? "text" : "password"}
               required
-              placeholder="VD: an@gmail.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full pl-10 pr-10 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" />
+              ) : (
+                <Eye className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Confirm Password */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-gray-700">Xác Nhận Mật Khẩu</label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full pl-10 pr-10 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
             />
           </div>
         </div>
 
-        {/* Mật khẩu & Xác nhận mật khẩu (2 cột) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-              Mật khẩu
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <Lock className="w-4 h-4" />
-              </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                placeholder="Ít nhất 3 ký tự"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-9 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
-              Xác nhận mật khẩu
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                <Lock className="w-4 h-4" />
-              </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                placeholder="Nhập lại mật khẩu"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-gray-50/70 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all font-medium"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Nút Đăng ký */}
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-4 py-3 px-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed active:scale-[0.99]"
+          className="w-full py-3 mt-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
         >
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Đang tạo tài khoản...</span>
+              <span>Đang Xử Lý...</span>
             </>
           ) : (
-            <span>Đăng Ký Tài Khoản {systemRole === "SHIPPER" ? "Tài Xế" : "Khách Hàng"}</span>
+            <span>Tạo Tài Khoản</span>
           )}
         </button>
       </form>
 
-      {/* Footer Switch to Login */}
+      {/* Switch to Login */}
       {onSwitchToLogin && (
-        <div className="mt-5 text-center text-xs text-gray-500">
-          Đã có tài khoản FoodGo?{" "}
-          <button
-            type="button"
-            onClick={onSwitchToLogin}
-            className="font-bold text-orange-600 hover:text-orange-700 transition-colors cursor-pointer"
-          >
-            Đăng nhập ngay
-          </button>
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500 font-medium">
+            Đã có tài khoản?{" "}
+            <button
+              onClick={onSwitchToLogin}
+              className="text-orange-600 font-bold hover:underline cursor-pointer"
+            >
+              Đăng Nhập Ngay
+            </button>
+          </p>
         </div>
       )}
     </div>
   );
 }
-

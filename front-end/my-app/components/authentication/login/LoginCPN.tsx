@@ -26,8 +26,18 @@ export default function LoginCPN() {
 
     // Nếu đăng nhập thành công
     if (fetchLoginUser.fulfilled.match(result)) {
-      alert("Đăng nhập thành công!");
-      window.location.href = "/admin/dashboard"; // Chuyển trang
+      const role = result.payload.data?.SystemRole;
+      if(role === "ADMIN") {
+        window.location.href = "/admin/dashboard";
+      } else if(role === "MERCHANT") {
+        window.location.href = "/restaurant/dashboard";
+      } else if(role === "SHIPPER") {
+        window.location.href = "/shipper/dashboard";
+      } else if(role === "CUSTOMER") {
+        window.location.href = "/customer/dashboard";
+      }else {
+        window.location.href = "/";
+      }
     }
   };
 

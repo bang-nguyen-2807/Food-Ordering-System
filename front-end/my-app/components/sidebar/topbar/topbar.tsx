@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   ShoppingCart,
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import LogoutModal from "@/components/authentication/logout/LogoutModal";
+import { usePathname } from "next/navigation";
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
@@ -28,9 +29,23 @@ export default function Topbar({
   userName = "Minh Anh",
   userRole = "Admin System",
 }: TopbarProps) {
+  const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const token = localStorage.getItem("accessToken");
+    setHasToken(!!token);
+  }, []);
+
+  // 💡 Ẩn Topbar khi CHƯA ĐĂNG NHẬP, hoặc ở trang Trang chủ, Nhà hàng, Login
+  if (!isMounted || !hasToken || pathname === "/" || pathname?.startsWith("/restaurant") || pathname?.startsWith("/authentication")) {
+    return null;
+  }
 
   return (
     <>

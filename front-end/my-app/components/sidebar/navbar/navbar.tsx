@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,6 +12,9 @@ import {
   Settings,
   LogOut,
   Utensils,
+  BookOpen,
+  Truck,
+  Store
 } from "lucide-react";
 import LogoutModal from "@/components/authentication/logout/LogoutModal";
 
@@ -25,7 +28,138 @@ interface NavItem {
 export default function Navbar() {
   const pathname = usePathname();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [hasToken, setHasToken] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
+    const token = localStorage.getItem("accessToken");
+    setHasToken(!!token);
+  }, []);
+
+  // 1. Tránh đè giao diện SSR & Ẩn Navbar khi CHƯA ĐĂNG NHẬP (chưa có token)
+  if (!isMounted || !hasToken) {
+    return null;
+  }
+
+  // 2. Nếu ở Trang chủ khách hàng ("/") hoặc Trang Đăng nhập/Đăng ký -> Không hiển thị Navbar
+  if (pathname === "/" || pathname?.startsWith("/authentication")) {
+    return null;
+  }
+
+  // 3. Nếu ở tuyến đường Nhà hàng (/restaurant) -> Hiển thị Sidebar Đối Tác đúng theo thiết kế
+  if (pathname?.startsWith("/restaurant")) {
+    const merchantNavItems: NavItem[] = [
+      {
+        title: "Tổng quan",
+        href: "/restaurant/dashboard",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Quản lý đơn hàng",
+        href: "/restaurant/orders",
+        icon: ShoppingBag,
+      },
+      {
+        title: "Quản lý thực đơn",
+        href: "/restaurant/menu",
+        icon: BookOpen,
+      },
+      {
+        title: "Giao hàng & Lịch sử",
+        href: "/restaurant/deliveries",
+        icon: Truck,
+      },
+    ];
+
+    return (
+      <>
+        <aside className="w-64 h-screen bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0 select-none shrink-0 shadow-xs z-40">
+          <div className="flex flex-col gap-6">
+            {/* Header Logo: FoodGo + Tag ĐỐI TÁC */}
+            <div className="flex items-center gap-2.5 px-3 py-2">
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold shadow-md shadow-orange-500/20">
+                <Utensils className="w-5 h-5" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-extrabold text-xl tracking-tight text-gray-900 leading-none">
+                    Food<span className="text-orange-500">Go</span>
+                  </span>
+                </div>
+                <span className="text-[10px] font-extrabold text-orange-600 tracking-wider uppercase mt-0.5">
+                  ĐỐI TÁC
+                </span>
+              </div>
+            </div>
+
+            {/* Danh sách Menu Nhà hàng */}
+            <nav className="space-y-1.5">
+              {merchantNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/restaurant/dashboard" && pathname?.startsWith(item.href));
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-semibold transition-all group ${
+                      isActive
+                        ? "bg-orange-50/80 text-orange-600 font-bold shadow-xs"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    <Icon
+                      className={`w-4.5 h-4.5 transition-transform group-hover:scale-110 ${
+                        isActive ? "text-orange-600" : "text-gray-400 group-hover:text-gray-600"
+                      }`}
+                    />
+                    <span>{item.title}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Footer Sidebar: Thông tin Nhà hàng */}
+          <div className="border-t border-gray-100 pt-4 mt-auto">
+            <div className="flex items-center justify-between p-2 rounded-2xl bg-gray-50/80 border border-gray-100">
+              <div className="flex items-center gap-2.5 truncate">
+                <div className="w-10 h-10 rounded-xl bg-orange-500 text-white font-bold flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+                  <Store className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col truncate">
+                  <span className="text-xs font-bold text-gray-900 truncate">
+                    Phở Bát Đàn Gia Tru...
+                  </span>
+                  <span className="text-[10px] text-gray-400 font-medium truncate">
+                    Chi nhánh Hoàn Kiếm
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsLogoutModalOpen(true)}
+                className="p-1.5 text-gray-400 hover:text-red-600 transition-colors cursor-pointer"
+                title="Đăng xuất"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <LogoutModal
+          isOpen={isLogoutModalOpen}
+          onClose={() => setIsLogoutModalOpen(false)}
+        />
+      </>
+    );
+  }
+
+  // 4. Mặc định là Sidebar Admin
   const mainNavItems: NavItem[] = [
     {
       title: "Tổng quan",

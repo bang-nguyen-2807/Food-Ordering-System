@@ -118,6 +118,16 @@ export class UserRepo{
             .input("RestaurantRole", sql.NVarChar(100), RestaurantRole || "OWNER")
             .query(queryRM);
 
+        // 💡 Tự động cập nhật SystemRole của User trong bảng Users thành 'MERCHANT' (nếu không phải ADMIN)
+        let queryUpdateUser = `
+            UPDATE Users
+            SET SystemRole = 'MERCHANT'
+            WHERE UserId = @UserId AND SystemRole != 'ADMIN';
+        `;
+        await pool.request()
+            .input("UserId", sql.Int, UserId)
+            .query(queryUpdateUser);
+
         return resRM.rowsAffected[0] > 0;
     }
 
@@ -163,15 +173,23 @@ export class UserRepo{
                 .input("RestaurantRole", sql.NVarChar(100), RestaurantRole)
                 .query(queryRM);
         }
+
+        // 💡 Tự động cập nhật SystemRole của User trong bảng Users thành 'MERCHANT' (nếu không phải ADMIN)
+        let queryUpdateUser = `
+            UPDATE Users
+            SET SystemRole = 'MERCHANT'
+            WHERE UserId = @UserId AND SystemRole != 'ADMIN';
+        `;
+        await pool.request()
+            .input("UserId", sql.Int, UserId)
+            .query(queryUpdateUser);
+
         return true;
     }
 
     // Xóa nhà hàng
     async deleteRestaurant(RestaurantId: number) {
         const pool = await connnectDB();
-        let queryRM = `DELETE FROM RestaurantManagers WHERE RestaurantId = @RestaurantId`;
-        await pool.request().input("RestaurantId", sql.Int, RestaurantId).query(queryRM);
-
         let queryRes = `DELETE FROM Restaurants WHERE RestaurantId = @RestaurantId`;
         const res = await pool.request().input("RestaurantId", sql.Int, RestaurantId).query(queryRes);
         return res.rowsAffected[0] > 0;

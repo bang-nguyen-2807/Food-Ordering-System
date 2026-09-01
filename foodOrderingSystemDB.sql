@@ -80,7 +80,7 @@ CREATE TABLE AdminCode (
     IsActive BIT DEFAULT 1,                        -- Bật/tắt code thủ công
     
     CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME(),
-    
+    Description NVARCHAR(300) NULL; -- mô tả chi tiết về mã giảm giá 
     -- Kiểm tra logic giá trị
     CONSTRAINT CK_AdminCode_AmountValid CHECK (
         (DiscountType = 'PERCENTAGE' AND Amount > 0 AND Amount <= 100) OR
