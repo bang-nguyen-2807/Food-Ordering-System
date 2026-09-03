@@ -31,20 +31,7 @@ export default function ManagerMenuCPN() {
         (state: RootState) => state.restaurantManagerMenu
     );
     const { user } = useSelector((state: RootState) => state.login);
-    const getStoredUserId = () => {
-        if (user?.UserId) return String(user.UserId);
-        if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("userInfo");
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    return String(parsed?.UserId || "");
-                } catch (e) {}
-            }
-        }
-        return "";
-    };
-    const UserId = getStoredUserId();
+    const UserId = String(user?.UserId || "");
 
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState<string>("");
