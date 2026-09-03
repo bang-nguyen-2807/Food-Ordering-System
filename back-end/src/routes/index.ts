@@ -7,6 +7,9 @@ import AdminUsersRoutes from "../routes/admin/UsersAndPartness/user.routes"
 import AdminManagerOrderRoutes from "../routes/admin/managerOrder/managerOrder.routes"
 import SaleCodeRoutes from "../routes/admin/saleCode/saleCode.routes"
 import AdminAnalyticsRoutes from "../routes/admin/analytics/Admin.Analytics.routes"
+import DashboardRoutes from "../routes/restaurant/dashboard/dashboard.routes"
+import ManagerOrderRoutes from "../routes/restaurant/managerOrder/managerOrder.routes"
+import ManagerMenuRoutes from "../routes/restaurant/managerMenu/managerMenu.routes"
 const rootRouter = Router();
 // middleware bảo vệ admin 
 //  ÁP DỤNG MIDDLEWARE BẢO VỆ CHO TOÀN BỘ NHÁNH /admin Ở ĐÂY:
@@ -19,7 +22,7 @@ rootRouter.use(
 rootRouter.use(
   "/restaurant",
   authenticateToken,
-  authorizeRoles("MERCHANT")
+  authorizeRoles("MERCHANT", "ADMIN")
 )
 // login
 rootRouter.use("/authentication" , LoginRoutes); // /api/authentication/login
@@ -30,5 +33,9 @@ rootRouter.use("/admin/userAndPartness" , AdminUsersRoutes ) // info user and re
 rootRouter.use("/admin/managerOrder" , AdminManagerOrderRoutes ) // info order /api/admin/managerOrder/infoOrder
 rootRouter.use("/admin/saleCode" , SaleCodeRoutes) // info saleCode /api/admin/saleCode/saleCode
 rootRouter.use("/admin/analytics" , AdminAnalyticsRoutes) // thống kê doanh thu /api/admin/analytics/data
+// restaurant
+rootRouter.use("/restaurant/dashboard" , DashboardRoutes) // thống kê doanh thu 
+rootRouter.use("/restaurant/managerOrder" , ManagerOrderRoutes)
+rootRouter.use("/restaurant/managerMenu" , ManagerMenuRoutes)
 
 export default rootRouter;

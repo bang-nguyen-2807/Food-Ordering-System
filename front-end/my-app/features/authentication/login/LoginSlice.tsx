@@ -40,12 +40,18 @@ interface LoginState {
   isRegisterSuccess: boolean;
   registerMessage: string | null;
 }
-
+export const getUserFromStorage = () : InfoLogin | null =>{ // đọc user từ localStorage lúc mới vừa đăng nhập để lưu info
+  if(typeof window !== "undefined"){
+    const saveUser = localStorage.getItem("userInfo");
+    return saveUser ? JSON.parse(saveUser) : null;
+  }
+  return null;
+}
 const initialState: LoginState = {
-  user: null,
+  user: getUserFromStorage(),
   token:
     typeof window !== "undefined" ? localStorage.getItem("accessToken") : null,
-  isAuthenticated: false,
+  isAuthenticated: !! getUserFromStorage() ,
   isLoading: false,
   error: null,
   isRegisterSuccess: false,
@@ -132,6 +138,7 @@ const loginSlice = createSlice({
       state.error = null;
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("userInfo"); // Xóa cả userInfo
       }
     },
     // Xóa lỗi chung
@@ -155,9 +162,14 @@ const loginSlice = createSlice({
       .addCase(fetchLoginUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.data || action.payload.user;
+        const userData = action.payload.data || action.payload.user;
+        state.user = userData
         state.token = action.payload.accessToken || action.payload.token;
         state.error = null;
+        // Lưu userInfo vào localStorage
+        if (typeof window !== "undefined" && userData) {
+          localStorage.setItem("userInfo", JSON.stringify(userData));
+        }
       })
       .addCase(fetchLoginUser.rejected, (state, action) => {
         state.isLoading = false;

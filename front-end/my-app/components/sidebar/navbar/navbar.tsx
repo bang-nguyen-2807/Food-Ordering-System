@@ -57,18 +57,13 @@ export default function Navbar() {
       },
       {
         title: "Quản lý đơn hàng",
-        href: "/restaurant/orders",
+        href: "/restaurant/managerOrder",
         icon: ShoppingBag,
       },
       {
         title: "Quản lý thực đơn",
-        href: "/restaurant/menu",
+        href: "/restaurant/managerMenu",
         icon: BookOpen,
-      },
-      {
-        title: "Giao hàng & Lịch sử",
-        href: "/restaurant/deliveries",
-        icon: Truck,
       },
     ];
 

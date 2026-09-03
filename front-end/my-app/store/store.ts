@@ -6,6 +6,9 @@ import adminUserSlice from "../features/admin/users/UserSlice"
 import adminOrderSlice from "../features/admin/order/OrderSlice"
 import adminSaleSlice from "../features/admin/sales/SalesSlice"
 import adminAnalyticsSlice from "../features/admin/analytics/analyticsSlice"
+import restaurantDashboardSlice from "../features/restaurant/dashboard/dashboardSlice"
+import restaurantManagerOrderSlice from "../features/restaurant/managerOrder/managerOrderSlice"
+import restaurantManagerMenuSlice from "../features/restaurant/managerMenu/managerMenuSlice"
 export const store = configureStore({
   reducer: {
     login: loginSlice,
@@ -15,7 +18,11 @@ export const store = configureStore({
     adminUserAndPartness : adminUserSlice,
     adminOrder : adminOrderSlice,
     adminSale : adminSaleSlice,
-    adminAnalytics: adminAnalyticsSlice
+    adminAnalytics: adminAnalyticsSlice,
+    // restaurant
+    restaurantDashboard : restaurantDashboardSlice,
+    restaurantManagerOrder : restaurantManagerOrderSlice,
+    restaurantManagerMenu : restaurantManagerMenuSlice
   },
 });
 

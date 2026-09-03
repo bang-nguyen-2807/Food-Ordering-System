@@ -53,6 +53,7 @@ CREATE TABLE MenuItems(
 	MenuItemId INT IDENTITY(1,1) PRIMARY KEY,
 	CategoriesRestaurantId INT NOT NULL,
 	NameMenuItems NVARCHAR(150),
+	Description NVARCHAR(255) NULL,
 	ImageUrl VARCHAR(255) NULL,
 	Price DECIMAL(18,2) NOT NULL, -- giá tiền 
 	is_available BIT NOT NULL DEFAULT 1,           -- Còn bán hay tạm hết (1 = True, 0 = False)
