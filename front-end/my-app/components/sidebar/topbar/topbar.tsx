@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import LogoutModal from "@/components/authentication/logout/LogoutModal";
 import { usePathname } from "next/navigation";
+import { Provider, useSelector } from "react-redux";
+import { RootState, store } from "@/store/store";
 
 interface TopbarProps {
   onToggleSidebar?: () => void;
@@ -23,29 +25,51 @@ interface TopbarProps {
   userRole?: string;
 }
 
-export default function Topbar({
+function TopbarContent({
   onToggleSidebar,
   cartCount = 3,
   userName = "Minh Anh",
   userRole = "Admin System",
 }: TopbarProps) {
   const pathname = usePathname();
+  const { user } = useSelector((state: RootState) => state.login);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [localUserInfo, setLocalUserInfo] = useState<{ FullName?: string; SystemRole?: string; UserName?: string } | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
     const token = localStorage.getItem("accessToken");
     setHasToken(!!token);
+    const saved = localStorage.getItem("userInfo");
+    if (saved) {
+      try {
+        setLocalUserInfo(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
   }, []);
 
-  // 💡 Ẩn Topbar khi CHƯA ĐĂNG NHẬP, hoặc ở trang Trang chủ, Nhà hàng, Tài xế, Login
-  if (!isMounted || !hasToken || pathname === "/" || pathname?.startsWith("/restaurant") || pathname?.startsWith("/shipper") || pathname?.startsWith("/authentication")) {
+  // Ẩn Topbar khi CHƯA ĐĂNG NHẬP, hoặc ở trang Trang chủ, Login
+  if (!isMounted || !hasToken || pathname === "/" || pathname?.startsWith("/authentication")) {
     return null;
   }
+
+  const currentUser = user || localUserInfo;
+  const displayName = currentUser?.FullName || currentUser?.UserName || userName;
+  const roleCode = currentUser?.SystemRole;
+
+  const displayRole = roleCode === "MERCHANT" 
+    ? "Đối tác Nhà hàng" 
+    : roleCode === "SHIPPER" 
+    ? "Tài xế Giao hàng" 
+    : roleCode === "ADMIN" 
+    ? "Admin System" 
+    : userRole;
 
   return (
     <>
@@ -138,10 +162,10 @@ export default function Topbar({
               </div>
               <div className="hidden sm:flex flex-col text-left">
                 <span className="text-sm font-semibold text-gray-800 leading-tight">
-                  {userName}
+                  {displayName}
                 </span>
                 <span className="text-[11px] text-gray-500 font-medium">
-                  {userRole}
+                  {displayRole}
                 </span>
               </div>
               <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
@@ -151,8 +175,8 @@ export default function Topbar({
             {showProfileMenu && (
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="px-4 py-2.5 border-b border-gray-100 sm:hidden">
-                  <p className="text-sm font-semibold text-gray-800">{userName}</p>
-                  <p className="text-xs text-gray-500">{userRole}</p>
+                  <p className="text-sm font-semibold text-gray-800">{displayName}</p>
+                  <p className="text-xs text-gray-500">{displayRole}</p>
                 </div>
                 <a
                   href="#profile"
@@ -166,12 +190,14 @@ export default function Topbar({
                 >
                   <Settings className="w-4 h-4" /> Cài đặt tài khoản
                 </a>
-                <a
-                  href="#admin"
-                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
-                >
-                  <ShieldCheck className="w-4 h-4" /> Quyền hệ thống
-                </a>
+                {(pathname?.startsWith("/admin") || roleCode === "ADMIN") && (
+                  <a
+                    href="#admin"
+                    className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
+                  >
+                    <ShieldCheck className="w-4 h-4" /> Quyền hệ thống
+                  </a>
+                )}
                 <div className="my-1 border-t border-gray-100"></div>
                 <button
                   onClick={() => {
@@ -194,5 +220,13 @@ export default function Topbar({
         onClose={() => setIsLogoutModalOpen(false)}
       />
     </>
+  );
+}
+
+export default function Topbar(props: TopbarProps) {
+  return (
+    <Provider store={store}>
+      <TopbarContent {...props} />
+    </Provider>
   );
 }

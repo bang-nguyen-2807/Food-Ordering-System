@@ -5,3 +5,4 @@ VERSION 1
     UPDATE 3 : - built shipper dashboard 
                - general header url for otimization link api and head url
                - display location for shipper and restaurant
+    UPDATE 3.1 - add topbar for restaurant and shipper

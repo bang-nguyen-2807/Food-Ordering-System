@@ -71,7 +71,7 @@ export default function Navbar() {
 
     return (
       <>
-        <aside className="w-64 h-screen bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0 select-none shrink-0 shadow-xs z-40">
+        <aside className="w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-16 select-none shrink-0 shadow-xs z-40">
           <div className="flex flex-col gap-6">
             {/* Header Logo: FoodGo + Tag ĐỐI TÁC */}
             <div className="flex items-center gap-2.5 px-3 py-2">
@@ -178,7 +178,7 @@ export default function Navbar() {
 
     return (
       <>
-        <aside className="w-64 h-screen bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-0 select-none shrink-0 shadow-xs z-40">
+        <aside className="w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-100 flex flex-col justify-between p-4 sticky top-16 select-none shrink-0 shadow-xs z-40">
           <div className="flex flex-col gap-6">
             {/* Header Logo: FoodGo + Tag TÀI XẾ GIAO HÀNG */}
             <div className="flex items-center gap-2.5 px-3 py-2">
