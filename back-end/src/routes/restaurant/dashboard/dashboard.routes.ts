@@ -6,4 +6,5 @@ const dashboardController = new DashboardController();
 router.get("/total", dashboardController.dashboardController) // /api/restaurant/dashboard/total
 router.get("/weeklyRevenue", dashboardController.weeklyRevenueController) // /api/restaurant/dashboard/weeklyRevenue
 router.get("/orderJustPlaced" , dashboardController.orderJustPlacedController) // /api/restaurant/dashboard/orderJustPlaced
+router.put("/updateLocation" , dashboardController.updateRestaurantLocationController) // /api/restaurant/dashboard/updateLocation
 export default router;

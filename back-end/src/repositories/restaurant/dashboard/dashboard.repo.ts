@@ -1,4 +1,5 @@
 import { DbHelpQueryRepo } from "../../../utils/dbHelpQueryRepo"
+import {Request} from "express"
 import sql from "mssql"
 export class DashboardRepo{
     async Dashboard(UserId : string){
@@ -191,5 +192,20 @@ export class DashboardRepo{
             ORDER BY O.OrderId DESC
         `
         return DbHelpQueryRepo.excuteQuery(query , [{name : "UserId" , type : sql.Int , value : UserId}])
+    }
+    async updateRestaurantLocation(req: Request) {
+        let query = `
+            EXEC UpdateRestaurantLocation @UserId = @UserId, @Latitude = @latitude, @Longitude = @longitude;
+        `
+        const UserId = req.body.UserId as string;
+        const longitude = req.body.longitude as string;
+        const latitude = req.body.latitude as string;
+        return DbHelpQueryRepo.excuteNonQuery(
+            query, [
+            { name: "UserId", type: sql.Int, value: UserId },
+            { name: "latitude", type: sql.Decimal(10, 7), value: latitude },
+            { name: "longitude", type: sql.Decimal(10, 7), value: longitude }
+        ]
+        )
     }
 }

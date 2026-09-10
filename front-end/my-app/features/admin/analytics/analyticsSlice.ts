@@ -1,4 +1,5 @@
 import { getAccessToken } from "@/features/util/getAccessKey";
+import { HeadUrl } from "@/features/util/helpRTK";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AnalyticsOverview {
@@ -134,7 +135,7 @@ export const fetchAnalyticsData = createAsyncThunk(
       if (currentFilters.restaurantId) queryParams.append("restaurantId", String(currentFilters.restaurantId));
       if (currentFilters.paymentMethod) queryParams.append("paymentMethod", currentFilters.paymentMethod);
 
-      const res = await fetch(`http://localhost:5000/api/admin/analytics/data?${queryParams.toString()}`, {
+      const res = await fetch(`${HeadUrl}/admin/analytics/data?${queryParams.toString()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

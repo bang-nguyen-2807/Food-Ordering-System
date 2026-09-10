@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getAccessToken } from "@/features/util/getAccessKey";
+import { HeadUrl } from "@/features/util/helpRTK";
 
 export interface RestaurantItem {
     RestaurantId: number;
@@ -59,7 +60,7 @@ export const fetchInfoOrder = createAsyncThunk(
                 }
             }
 
-            const res = await fetch(`http://localhost:5000/api/admin/managerOrder/infoOrder?Status=${statusQuery}&RestaurantId=${restaurantIdQuery}`, {
+            const res = await fetch(`${HeadUrl}/admin/managerOrder/infoOrder?Status=${statusQuery}&RestaurantId=${restaurantIdQuery}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -86,7 +87,7 @@ export const fetchRestaurantsList = createAsyncThunk(
     "admin/getRestaurantsList", async(_, thunkAPI)=>{
         try{
             const token = getAccessToken();
-            const res = await fetch(`http://localhost:5000/api/admin/managerOrder/restaurants`, {
+            const res = await fetch(`${HeadUrl}/admin/managerOrder/restaurants`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

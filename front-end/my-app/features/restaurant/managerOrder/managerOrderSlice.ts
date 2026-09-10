@@ -26,7 +26,7 @@ const initialState : initialState = {
 export const fetchManagerOrder = createAsyncThunk(
     "managerOrder/fetchManagerOrder" , async({UserId , OrderStatus} : {UserId : string , OrderStatus : string} , thunkAPI)=>{
         try{
-            return await otimizeSliceGET<infoManagerOrder[]>(`http://localhost:5000/api/restaurant/managerOrder/order?UserId=${UserId}&OrderStatus=${OrderStatus}` , thunkAPI)
+            return await otimizeSliceGET<infoManagerOrder[]>(`/restaurant/managerOrder/order?UserId=${UserId}&OrderStatus=${OrderStatus}` , thunkAPI)
         }
         catch(err){
             return otimizeSliceError(err , thunkAPI , "Không thể lấy thông tin đơn hàng")
@@ -37,7 +37,7 @@ export const fetchUpdateOrderStatus = createAsyncThunk(
     "managerOrder/fetchUpdateOrderStatus",
     async ({ OrderId, OrderStatus }: { OrderId: number; OrderStatus: string }, thunkAPI) => {
         try {
-            return await otimizeSliceUpdate("http://localhost:5000/api/restaurant/managerOrder/updateStatus", thunkAPI, { OrderId, OrderStatus });
+            return await otimizeSliceUpdate("/restaurant/managerOrder/updateStatus", thunkAPI, { OrderId, OrderStatus });
         } catch (err) {
             return otimizeSliceError(err, thunkAPI, "Không thể cập nhật trạng thái đơn hàng");
         }

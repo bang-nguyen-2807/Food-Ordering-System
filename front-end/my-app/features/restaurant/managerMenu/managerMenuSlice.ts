@@ -35,7 +35,7 @@ export const fetchManagerMenu = createAsyncThunk(
     async ({ UserId, CategoriesRestaurantId }: { UserId: string; CategoriesRestaurantId: string }, thunkAPI) => {
         try {
             return await otimizeSliceGET<infoMenuItem[]>(
-                `http://localhost:5000/api/restaurant/managerMenu/menu?UserId=${UserId}&CategoriesRestaurantId=${CategoriesRestaurantId}`,
+                `/restaurant/managerMenu/menu?UserId=${UserId}&CategoriesRestaurantId=${CategoriesRestaurantId}`,
                 thunkAPI
             );
         } catch (err) {
@@ -49,7 +49,7 @@ export const fetchCategoriesRestaurant = createAsyncThunk(
     async (UserId: string, thunkAPI) => {
         try {
             return await otimizeSliceGET<infoCategoriesRestaurant[]>(
-                `http://localhost:5000/api/restaurant/managerMenu/categories?UserId=${UserId}`,
+                `/restaurant/managerMenu/categories?UserId=${UserId}`,
                 thunkAPI
             );
         } catch (err) {
@@ -74,7 +74,7 @@ export const fetchAddMenuItem = createAsyncThunk(
     ) => {
         try {
             return await otimizeSlicePost(
-                "http://localhost:5000/api/restaurant/managerMenu/addMenuItem",
+                "/restaurant/managerMenu/addMenuItem",
                 thunkAPI,
                 data
             );
@@ -98,7 +98,7 @@ export const fetchAddCategoriesRestaurant = createAsyncThunk(
     ) => {
         try {
             return await otimizeSlicePost(
-                "http://localhost:5000/api/restaurant/managerMenu/addCategories",
+                "/restaurant/managerMenu/addCategories",
                 thunkAPI,
                 data
             );
@@ -113,7 +113,7 @@ export const fetchDeleteMenuItem = createAsyncThunk(
     async (MenuItemId: number, thunkAPI) => {
         try {
             return await otimizeSliceDelete(
-                `http://localhost:5000/api/restaurant/managerMenu/deleteMenuItem/${MenuItemId}`,
+                `/restaurant/managerMenu/deleteMenuItem/${MenuItemId}`,
                 thunkAPI,
                 {}
             );
@@ -128,7 +128,7 @@ export const fetchDeleteCategoriesRestaurant = createAsyncThunk(
     async (CategoriesRestaurantId: number, thunkAPI) => {
         try {
             return await otimizeSliceDelete(
-                `http://localhost:5000/api/restaurant/managerMenu/deleteCategories/${CategoriesRestaurantId}`,
+                `/restaurant/managerMenu/deleteCategories/${CategoriesRestaurantId}`,
                 thunkAPI,
                 {}
             );
@@ -153,7 +153,7 @@ export const fetchUpdateMenuItem = createAsyncThunk(
     ) => {
         try {
             return await otimizeSliceUpdate(
-                "http://localhost:5000/api/restaurant/managerMenu/updateMenuItem",
+                "/restaurant/managerMenu/updateMenuItem",
                 thunkAPI,
                 data
             );

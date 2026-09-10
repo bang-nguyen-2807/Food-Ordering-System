@@ -27,14 +27,17 @@ CREATE TABLE Categories(
 	CategoriesName NVARCHAR(50) NOT NULL,
 	CategoriesCode VARCHAR(30) NOT NULL,
 	Descriptions NVARCHAR(255) NULL,
-	ImageUrl VARCHAR(255) NULL
+	ImageUrl VARCHAR(255) NULL,
 )
 GO
 -- RESTAURANT
 CREATE TABLE Restaurants(
 	RestaurantId INT IDENTITY(1,1) PRIMARY KEY,
 	RestaurantName NVARCHAR(255),
-	Addresses NVARCHAR(255)
+	Addresses NVARCHAR(255),
+    Latitude DECIMAL(10,7) NULL, -- vĩ độ
+    Longitude DECIMAL(10,7) NULL, -- kinh độ
+    Location geography NULL -- địa điểm
 )
 GO
 --CATEGORIES_RESTAURANT -- loại đồ ăn của nhà hàng
@@ -203,7 +206,12 @@ GO
 CREATE TABLE Shipper(
     ShipperId INT IDENTITY(1,1) PRIMARY KEY,
     UserId INT UNIQUE NOT NULL,
-    FOREIGN KEY (UserId) references Users(UserId)
+    FOREIGN KEY (UserId) references Users(UserId),
+    Latitude DECIMAL(10,7) NULL, -- vĩ độ
+    Longitude DECIMAL(10,7) NULL, -- kinh độ
+    LastLocationUpdate DATETIME2 NULL, --Lần cuối cập nhật GPS
+    IsOnline BIT NOT NULL DEFAULT 0 ,-- Shipper đang online hay không
+    Location geography NULL;
 )
 GO
 -- DELIVERIES : giao hàng
@@ -265,4 +273,123 @@ CREATE TABLE RestaurantManagers (
     FOREIGN KEY (RestaurantId) REFERENCES Restaurants(RestaurantId) ON DELETE CASCADE,
     FOREIGN KEY (UserId) REFERENCES Users(UserId) ON DELETE CASCADE
 );
+GO
+-- 1. Stored Procedure: Cập nhật vị trí GPS của Shipper
+CREATE OR ALTER PROCEDURE UpdateShipperLocation
+    @UserId INT,
+    @Latitude DECIMAL(10,7),
+    @Longitude DECIMAL(10,7)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE Shipper
+    SET
+        Latitude = @Latitude,
+        Longitude = @Longitude,
+        Location = geography::Point(
+            @Latitude,
+            @Longitude,
+            4326
+        ),
+        LastLocationUpdate = SYSUTCDATETIME(),
+        IsOnline = 1
+    WHERE UserId = @UserId;
+END;
+GO
+
+-- 2. Stored Procedure: Lấy danh sách các đơn hàng gần Shipper nhất trong bán kính
+CREATE OR ALTER PROCEDURE GetAvailableDeliveries
+    @UserId INT,
+    @RadiusMeter INT = 5000
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @ShipperLocation geography;
+
+    -- 1. Lấy vị trí hiện tại của Shipper dựa trên UserId
+    SELECT @ShipperLocation = Location
+    FROM Shipper
+    WHERE UserId = @UserId
+      AND IsOnline = 1
+      AND Location IS NOT NULL
+      AND LastLocationUpdate >= DATEADD(
+          MINUTE,
+          -2,
+          SYSUTCDATETIME()
+      );
+
+    -- 2. Nếu Shipper chưa Online hoặc không có vị trí (quá 2 phút chưa cập nhật GPS) -> Thoát
+    IF @ShipperLocation IS NULL
+    BEGIN
+        RETURN;
+    END;
+
+    -- 3. Lấy danh sách các chuyến giao đang tìm tài xế nằm trong bán kính quy định
+    SELECT
+        d.DeliveriesId,
+        d.OrderId,
+        d.DeliveryStatus,
+
+        o.RestaurantId,
+        r.RestaurantName,
+        r.Addresses AS RestaurantAddress,
+
+        o.DeliveryAddress,
+        o.ReceiverPhone,
+        o.TotalPrice,
+
+        r.Location.STDistance(
+            @ShipperLocation
+        ) AS DistanceMeter
+
+    FROM Deliveries d
+
+    INNER JOIN Orders o
+        ON d.OrderId = o.OrderId
+
+    INNER JOIN Restaurants r
+        ON o.RestaurantId = r.RestaurantId
+
+    WHERE
+        d.DeliveryStatus = 'FINDING_DRIVER'
+        AND d.ShipperId IS NULL  -- Đơn chưa có tài xế nào nhận
+        AND r.Location IS NOT NULL
+
+        AND r.Location.STDistance(
+            @ShipperLocation
+        ) <= @RadiusMeter
+
+    ORDER BY
+        r.Location.STDistance(
+            @ShipperLocation
+        );
+END;
+GO
+-- Update vị trí nhà hàng
+CREATE OR ALTER PROCEDURE UpdateRestaurantLocation
+    @UserId INT,
+    @Latitude DECIMAL(10,7),
+    @Longitude DECIMAL(10,7)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE R
+    SET
+        R.Latitude = @Latitude,
+        R.Longitude = @Longitude,
+        R.Location = geography::Point(
+            @Latitude,
+            @Longitude,
+            4326
+        )
+    FROM Restaurants AS R
+    INNER JOIN RestaurantManagers AS RM
+        ON R.RestaurantId = RM.RestaurantId
+    INNER JOIN Users AS U
+        ON RM.UserId = U.UserId
+    WHERE U.UserId = @UserId;
+END;
 GO

@@ -1,40 +1,87 @@
 import ErrorSpinner from "@/components/spinner/error";
 import LoadingSpinner from "@/components/spinner/loading";
-import { fetchDashboard , fetchWeeklyRevenue , fetchOrderJustPlaced } from "@/features/restaurant/dashboard/dashboardSlice";
+import { fetchDashboard, fetchWeeklyRevenue, fetchOrderJustPlaced, fetchUpdateLocationRestaurant } from "@/features/restaurant/dashboard/dashboardSlice";
 import { AppDispatch, RootState } from "@/store/store"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import { ShoppingBag, DollarSign, Clock, CheckCircle2, Bell, Utensils, XCircle, AlertCircle } from "lucide-react";
-
+import { ShoppingBag, DollarSign, Clock, CheckCircle2, Bell, Utensils, XCircle, AlertCircle, MapPin } from "lucide-react";
+import RestaurantLocation from "@/components/location/restaurant/restaurantLocation";
 export default function DashboardCPN() {
     const dispatch = useDispatch<AppDispatch>();
-    const {user} = useSelector((state : RootState)=> state.login);
-    const {dataTotal , dataWeeklyRevenue , dataOrderJustPlaced , loading , err} = useSelector((state : RootState)=> state.restaurantDashboard);
+    const { user } = useSelector((state: RootState) => state.login);
+    const { dataTotal, dataWeeklyRevenue, dataOrderJustPlaced, loading, err } = useSelector((state: RootState) => state.restaurantDashboard);
     const UserId = user?.UserId || "";
-    useEffect(()=>{ 
-        if(UserId !== ""){
+    const [longitude, setLongitude] = useState<string>("");
+    const [latitude, setLatitude] = useState<string>("");
+    const [nameLocation, setNameLocation] = useState<string>("");
+    const apiKey = process.env.NEXT_PUBLIC_API_KEY as string;
+    useEffect(() => {
+        if (UserId !== "") {
             dispatch(fetchDashboard(String(UserId))); // fetch info total
             dispatch(fetchWeeklyRevenue(String(UserId))); // fetch info weekly revenue
             dispatch(fetchOrderJustPlaced(String(UserId))); // fetch info order just placed
         }
-    },[UserId , dispatch])
-
-    if(loading){
-        return <LoadingSpinner message="Loading Dashboard ..."/>
+    }, [UserId, dispatch])
+    const getPosition = () => {
+        // get longitude and latitude
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { longitude, latitude } = position.coords;
+                    setLongitude(longitude.toString());
+                    setLatitude(latitude.toString());
+                    if (UserId) {
+                        dispatch(
+                            fetchUpdateLocationRestaurant({
+                                UserId: String(UserId),
+                                longitude: longitude.toString(),
+                                latitude: latitude.toString(),
+                            })
+                        );
+                    }
+                },
+                (error) => {
+                    console.error("Error getting location:", error.message);
+                }
+            );
+        }
+    };
+    useEffect(() => {
+        getPosition();
+    }, [UserId, dispatch, longitude, latitude])
+    // get name in currently location 
+    const fetchAddress = async()=>{
+        if (!latitude || !longitude) {
+        console.log("--> Thiếu tọa độ latitude/longitude");
+        return;
+      }
+      try{
+        const address = await RestaurantLocation(latitude, longitude, apiKey);
+        setNameLocation(address);
+      }
+      catch(error){
+        console.log("Error getting address:", error);
+      }
     }
-    if(err){
-        return <ErrorSpinner message={err as string}/>
+    useEffect(() => {
+        fetchAddress();
+    }, [latitude, longitude])
+    if (loading) {
+        return <LoadingSpinner message="Loading Dashboard ..." />
+    }
+    if (err) {
+        return <ErrorSpinner message={err as string} />
     }
 
     // Tính toán chiều cao tương đối cho biểu đồ doanh thu
-    const maxRevenue = dataWeeklyRevenue.length > 0 
-        ? Math.max(...dataWeeklyRevenue.map((i) => Number(i.Revenue) || 0), 1) 
+    const maxRevenue = dataWeeklyRevenue.length > 0
+        ? Math.max(...dataWeeklyRevenue.map((i) => Number(i.Revenue) || 0), 1)
         : 1;
 
     return (
         <div className="p-6 space-y-8 animate-in fade-in duration-200 bg-gray-50/50 min-h-screen">
             {/* 1. Header Trang */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 sm:p-6 rounded-3xl border border-gray-100 shadow-xs">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
                         Tổng quan hoạt động nhà hàng
@@ -44,15 +91,46 @@ export default function DashboardCPN() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3 self-start sm:self-auto">
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-200/60 rounded-full text-xs font-extrabold">
+                <div className="flex flex-wrap items-center gap-3.5 self-start xl:self-auto">
+                    {/* Badge Vị trí Nhà hàng (UX/UI Mới) */}
+                    <div className="flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-orange-50/80 to-amber-50/50 border border-orange-200/70 rounded-2xl shadow-2xs transition-all max-w-xs sm:max-w-md group hover:border-orange-300">
+                        <div className="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform">
+                            <MapPin className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-orange-600">
+                                    Vị trí nhà hàng
+                                </span>
+                                <span className="inline-flex items-center gap-1 text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded-full font-bold">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    GPS
+                                </span>
+                            </div>
+                            <p className="text-xs font-extrabold text-gray-800 truncate mt-0.5" title={nameLocation || "Đang xác định vị trí..."}>
+                                {nameLocation ? (
+                                    nameLocation
+                                ) : latitude && longitude ? (
+                                    <span className="text-gray-500 font-medium italic animate-pulse">
+                                        Đang nhận diện địa chỉ khu vực...
+                                    </span>
+                                ) : (
+                                    <span className="text-gray-400 font-normal italic animate-pulse">
+                                        Đang định vị GPS...
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    </div>
+
+                    <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200/60 rounded-2xl text-xs font-extrabold shadow-2xs">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         Đang mở cửa
                     </span>
 
-                    <button className="p-2.5 bg-white hover:bg-gray-50 text-gray-700 rounded-full border border-gray-200 shadow-xs transition-all cursor-pointer relative">
-                        <Bell className="w-4 h-4 text-gray-600" />
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+                    <button className="p-2.5 bg-white hover:bg-gray-50 text-gray-700 rounded-2xl border border-gray-200 shadow-2xs transition-all cursor-pointer relative">
+                        <Bell className="w-4.5 h-4.5 text-gray-600" />
+                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full"></span>
                     </button>
                 </div>
             </div>
@@ -196,11 +274,10 @@ export default function DashboardCPN() {
                                     </span>
                                     <div
                                         style={{ height: `${heightPercent}%` }}
-                                        className={`w-full max-w-[42px] rounded-2xl transition-all shadow-xs ${
-                                            isHighest
+                                        className={`w-full max-w-[42px] rounded-2xl transition-all shadow-xs ${isHighest
                                                 ? "bg-gradient-to-t from-orange-500 to-amber-500"
                                                 : "bg-gray-100 hover:bg-gray-200"
-                                        }`}
+                                            }`}
                                     ></div>
                                     <span className="text-xs font-semibold text-gray-400 mt-3">{item.DayName}</span>
                                 </div>

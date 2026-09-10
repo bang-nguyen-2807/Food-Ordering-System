@@ -1,4 +1,5 @@
 import { getAccessToken } from "@/features/util/getAccessKey";
+import { HeadUrl } from "@/features/util/helpRTK";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 interface infoDashboard {
   usersTotals: number;
@@ -45,7 +46,7 @@ export const fetchDashboard = createAsyncThunk(
       // 1. Tự lấy token đã lưu từ localStorage ra
   const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/dashboard/total" , {
+        `${HeadUrl}/admin/dashboard/total` , {
             method : "GET",
             headers : {
               "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export const fetchOrderComplete = createAsyncThunk( // đơn hàng đã thành c
       // 1. Tự lấy token đã lưu từ localStorage ra
   const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/dashboard/order/complete" , {
+        `${HeadUrl}/admin/dashboard/order/complete` , {
             method : "GET",
             headers : {
               "Content-Type": "application/json",
@@ -99,7 +100,7 @@ export const fetchOrderConfirmed = createAsyncThunk( // chờ xác nhận
       // 1. Tự lấy token đã lưu từ localStorage ra
   const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/dashboard/order/confirmed" , {
+        `${HeadUrl}/admin/dashboard/order/confirmed` , {
             method : "GET",
             headers : {
               "Content-Type": "application/json",

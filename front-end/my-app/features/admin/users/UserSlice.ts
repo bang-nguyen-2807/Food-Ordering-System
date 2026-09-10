@@ -1,4 +1,5 @@
 import { getAccessToken } from "@/features/util/getAccessKey";
+import { HeadUrl } from "@/features/util/helpRTK";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export interface infoUsers {
   UserId: number;
@@ -88,7 +89,7 @@ export const fetchInfoUser = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/user",
+        `${HeadUrl}/admin/userAndPartness/user`,
         {
           method: "GET",
           headers: {
@@ -118,7 +119,7 @@ export const fetchInfoRestaurant = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/restaurant",
+        `${HeadUrl}/admin/userAndPartness/restaurant`,
         {
           method: "GET",
           headers: {
@@ -148,7 +149,7 @@ export const fetchInfoShipper = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/shipper",
+        `${HeadUrl}/admin/userAndPartness/shipper`,
         {
           method: "GET",
           headers: {
@@ -181,7 +182,7 @@ export const fetchAddUser = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/addUser",
+        `${HeadUrl}/admin/userAndPartness/addUser`,
         {
           method: "POST",
           headers: {
@@ -220,7 +221,7 @@ export const fetchUpdateUser = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/updateUser/${UserId}`,
+        `${HeadUrl}/admin/userAndPartness/updateUser/${UserId}`,
         {
           method: "PUT",
           headers: {
@@ -249,7 +250,7 @@ export const fetchDeleteUser = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/deleteUser/${UserId}`,
+        `${HeadUrl}/admin/userAndPartness/deleteUser/${UserId}`,
         {
           method: "DELETE",
           headers: {
@@ -280,7 +281,7 @@ export const fetchAddRestaurant = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/addRestaurant",
+        `${HeadUrl}/admin/userAndPartness/addRestaurant`,
         {
           method: "POST",
           headers: {
@@ -324,7 +325,7 @@ export const fetchUpdateRestaurant = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/updateRestaurant/${RestaurantId}`,
+        `${HeadUrl}/admin/userAndPartness/updateRestaurant/${RestaurantId}`,
         {
           method: "PUT",
           headers: {
@@ -359,7 +360,7 @@ export const fetchDeleteRestaurant = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/deleteRestaurant/${RestaurantId}`,
+        `${HeadUrl}/admin/userAndPartness/deleteRestaurant/${RestaurantId}`,
         {
           method: "DELETE",
           headers: {
@@ -392,7 +393,7 @@ export const fetchAddShipper = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/admin/userAndPartness/addShipper",
+        `${HeadUrl}/admin/userAndPartness/addShipper`,
         {
           method: "POST",
           headers: {
@@ -439,7 +440,7 @@ export const fetchUpdateShipper = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/updateShipper/${ShipperId}`,
+        `${HeadUrl}/admin/userAndPartness/updateShipper/${ShipperId}`,
         {
           method: "PUT",
           headers: {
@@ -475,7 +476,7 @@ export const fetchDeleteShipper = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        `http://localhost:5000/api/admin/userAndPartness/deleteShipper/${ShipperId}`,
+        `${HeadUrl}/admin/userAndPartness/deleteShipper/${ShipperId}`,
         {
           method: "DELETE",
           headers: {

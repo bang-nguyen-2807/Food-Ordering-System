@@ -1,4 +1,5 @@
 import { getAccessToken } from "@/features/util/getAccessKey";
+import { HeadUrl } from "@/features/util/helpRTK";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface CreateAccountPayload {
@@ -43,7 +44,7 @@ export const fetchCreateAccount = createAsyncThunk(
     try {
       const token = getAccessToken();
       const res = await fetch(
-        "http://localhost:5000/api/authentication/createAccount",
+        `${HeadUrl}/authentication/createAccount`,
         {
           method: "POST",
           body: JSON.stringify(payload),

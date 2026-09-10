@@ -2,10 +2,11 @@ import { AsyncThunkConfig, GetThunkAPI } from "@reduxjs/toolkit";
 import { getAccessToken } from "./getAccessKey"
 // otimization API calls in redux toolkit
 // GET OTIMIZE
+export const HeadUrl : string = "http://localhost:5000/api";
 export async function otimizeSliceGET<T>(url: string, ThunkAPI: GetThunkAPI<AsyncThunkConfig>) {
 
     const token = getAccessToken();
-    const res = await fetch(url, {
+    const res = await fetch(HeadUrl + url, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -24,7 +25,7 @@ export async function otimizeSliceGET<T>(url: string, ThunkAPI: GetThunkAPI<Asyn
 // POST OTIMIZE
 export async function otimizeSlicePost<T, B = any>(url: string, ThunkAPI: GetThunkAPI<AsyncThunkConfig>, body: B) {
     const token = getAccessToken();
-    const res = await fetch(url, {
+    const res = await fetch(HeadUrl + url, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -44,7 +45,7 @@ export async function otimizeSlicePost<T, B = any>(url: string, ThunkAPI: GetThu
 // UPDATE OTIMIZE
 export async function otimizeSliceUpdate<T, B = any>(url: string, ThunkAPI: GetThunkAPI<AsyncThunkConfig>, body: B) {
     const token = getAccessToken();
-    const res = await fetch(url, {
+    const res = await fetch(HeadUrl + url, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -64,7 +65,7 @@ export async function otimizeSliceUpdate<T, B = any>(url: string, ThunkAPI: GetT
 // DELETE OTIMIZE
 export async function otimizeSliceDelete<T, B = any>(url: string, ThunkAPI: GetThunkAPI<AsyncThunkConfig>, body: B) {
     const token = getAccessToken();
-    const res = await fetch(url, {
+    const res = await fetch(HeadUrl + url, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",

@@ -37,7 +37,7 @@ const initialState : initialState = {
 export const fetchInfoSale = createAsyncThunk(
     "admin/fetchInfoSale", async(_ , thunkAPI)=>{
         try{
-            return await otimizeSliceGET<infoSaleCode[]>("http://localhost:5000/api/admin/saleCode/listSaleCode" , thunkAPI)
+            return await otimizeSliceGET<infoSaleCode[]>("/admin/saleCode/listSaleCode" , thunkAPI)
         }catch(err){
             return otimizeSliceError(err , thunkAPI , "lỗi lấy dữ liệu")
         }
@@ -46,7 +46,7 @@ export const fetchInfoSale = createAsyncThunk(
 export const fetchAddSale = createAsyncThunk(
     "admin/fetchAddSale" , async(body : postAddSale , thunkAPI)=>{
         try{
-            const res = await otimizeSlicePost<any , postAddSale>("http://localhost:5000/api/admin/saleCode/addSaleCode" , thunkAPI , body)
+            const res = await otimizeSlicePost<any , postAddSale>("/admin/saleCode/addSaleCode" , thunkAPI , body)
             thunkAPI.dispatch(fetchInfoSale());
             return res;
         }catch(err){
@@ -57,7 +57,7 @@ export const fetchAddSale = createAsyncThunk(
 export const fetchDeleteSale = createAsyncThunk(
     "admin/fetchDeleteSale" , async(AdminCodeId : number , thunkAPI) => {
         try{
-            const res = await otimizeSliceDelete<number , any>(`http://localhost:5000/api/admin/saleCode/deleteSaleCode/${AdminCodeId}` , thunkAPI, { AdminCodeId })
+            const res = await otimizeSliceDelete<number , any>(`/admin/saleCode/deleteSaleCode/${AdminCodeId}` , thunkAPI, { AdminCodeId })
             thunkAPI.dispatch(fetchInfoSale());
             return res;
         }catch(err){

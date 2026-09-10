@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { HeadUrl } from "@/features/util/helpRTK";
 
 export interface InfoLogin {
   UserId: number;
@@ -67,7 +68,7 @@ export const fetchLoginUser = createAsyncThunk(
   ) => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/authentication/login",
+        `${HeadUrl}/authentication/login`,
         {
           method: "POST",
           body: JSON.stringify({ username, password }),
@@ -102,7 +103,7 @@ export const fetchCreateAccount = createAsyncThunk(
   async (formData: CreateAccountPayload, thunkAPI) => {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/authentication/createAccount",
+        `${HeadUrl}/authentication/createAccount`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

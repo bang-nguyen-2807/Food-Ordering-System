@@ -42,8 +42,8 @@ export default function Topbar({
     setHasToken(!!token);
   }, []);
 
-  // 💡 Ẩn Topbar khi CHƯA ĐĂNG NHẬP, hoặc ở trang Trang chủ, Nhà hàng, Login
-  if (!isMounted || !hasToken || pathname === "/" || pathname?.startsWith("/restaurant") || pathname?.startsWith("/authentication")) {
+  // 💡 Ẩn Topbar khi CHƯA ĐĂNG NHẬP, hoặc ở trang Trang chủ, Nhà hàng, Tài xế, Login
+  if (!isMounted || !hasToken || pathname === "/" || pathname?.startsWith("/restaurant") || pathname?.startsWith("/shipper") || pathname?.startsWith("/authentication")) {
     return null;
   }
 

@@ -1,5 +1,5 @@
 import { DashboardRepo } from "../../../repositories/restaurant/dashboard/dashboard.repo";
-
+import { Request } from "express";
 export class DashboardRepoService{
     private dashboardRepo  : DashboardRepo;
     constructor(){
@@ -16,6 +16,10 @@ export class DashboardRepoService{
     }
     async orderJustPlacedService(UserId : string){
         const result = await this.dashboardRepo.orderJustPlaced(UserId);
+        return result;
+    }
+    async updateRestaurantLocationService(req: Request) {
+        const result = await this.dashboardRepo.updateRestaurantLocation(req);
         return result;
     }
 }
