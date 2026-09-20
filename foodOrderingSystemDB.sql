@@ -87,7 +87,7 @@ CREATE TABLE AdminCode (
     IsActive BIT DEFAULT 1,                        -- Bật/tắt code thủ công
     
     CreatedAt DATETIME2 DEFAULT SYSUTCDATETIME(),
-    Description NVARCHAR(300) NULL; -- mô tả chi tiết về mã giảm giá 
+    Description NVARCHAR(300) NULL, -- mô tả chi tiết về mã giảm giá 
     -- Kiểm tra logic giá trị
     CONSTRAINT CK_AdminCode_AmountValid CHECK (
         (DiscountType = 'PERCENTAGE' AND Amount > 0 AND Amount <= 100) OR
@@ -215,7 +215,7 @@ CREATE TABLE Shipper(
     Longitude DECIMAL(10,7) NULL, -- kinh độ
     LastLocationUpdate DATETIME2 NULL, --Lần cuối cập nhật GPS
     IsOnline BIT NOT NULL DEFAULT 0 ,-- Shipper đang online hay không
-    Location geography NULL;
+    Location geography NULL
 )
 GO
 -- DELIVERIES : giao hàng
