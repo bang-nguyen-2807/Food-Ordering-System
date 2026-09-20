@@ -2,7 +2,7 @@ import { AsyncThunkConfig, GetThunkAPI } from "@reduxjs/toolkit";
 import { getAccessToken } from "./getAccessKey"
 // otimization API calls in redux toolkit
 // GET OTIMIZE
-export const HeadUrl : string = "http://localhost:5000/api";
+export const HeadUrl : string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 export async function otimizeSliceGET<T>(url: string, ThunkAPI: GetThunkAPI<AsyncThunkConfig>) {
 
     const token = getAccessToken();
