@@ -10,6 +10,10 @@ import restaurantDashboardSlice from "../features/restaurant/dashboard/dashboard
 import restaurantManagerOrderSlice from "../features/restaurant/managerOrder/managerOrderSlice"
 import restaurantManagerMenuSlice from "../features/restaurant/managerMenu/managerMenuSlice"
 import dashboardShipperSlice from "../features/shipper/dashboard/dashboardSlice"
+import homeUserSlice from "../features/users/home/HomeSlice"
+import infoRestaurantSlice from "../features/users/infoRestaurant/infoRestaurantSlice"
+import cartUserSlice from "../features/users/cartUser/cartUserSlice"
+import infoUserSlice from "../features/users/infoUser/infoUserSlice"
 export const store = configureStore({
   reducer: {
     login: loginSlice,
@@ -26,6 +30,11 @@ export const store = configureStore({
     restaurantManagerMenu : restaurantManagerMenuSlice,
     // shipper
     dashboardShipper : dashboardShipperSlice,
+    // user
+    homeUser : homeUserSlice,
+    infoRestaurant : infoRestaurantSlice,
+    cartUser : cartUserSlice,
+    infoUser : infoUserSlice,
   },
 });
 

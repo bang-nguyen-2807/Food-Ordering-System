@@ -14,7 +14,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import LogoutModal from "@/components/authentication/logout/LogoutModal";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Provider, useSelector } from "react-redux";
 import { RootState, store } from "@/store/store";
 
@@ -39,7 +39,7 @@ function TopbarContent({
   const [hasToken, setHasToken] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [localUserInfo, setLocalUserInfo] = useState<{ FullName?: string; SystemRole?: string; UserName?: string } | null>(null);
-
+  const router = useRouter();
   useEffect(() => {
     setIsMounted(true);
     const token = localStorage.getItem("accessToken");
@@ -178,12 +178,12 @@ function TopbarContent({
                   <p className="text-sm font-semibold text-gray-800">{displayName}</p>
                   <p className="text-xs text-gray-500">{displayRole}</p>
                 </div>
-                <a
-                  href="#profile"
+                <button
+                  onClick={() => router.push("/users/infoUser")}
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"
                 >
                   <User className="w-4 h-4" /> Thông tin cá nhân
-                </a>
+                </button>
                 <a
                   href="#settings"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 transition-colors"

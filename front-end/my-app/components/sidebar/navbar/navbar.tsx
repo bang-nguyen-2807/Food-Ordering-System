@@ -45,7 +45,7 @@ export default function Navbar() {
   }
 
   // 2. Nếu ở Trang chủ khách hàng ("/") hoặc Trang Đăng nhập/Đăng ký -> Không hiển thị Navbar
-  if (pathname === "/" || pathname?.startsWith("/authentication")) {
+  if (pathname === "/" || pathname?.startsWith("/authentication") || pathname?.startsWith("/users")) {
     return null;
   }
 

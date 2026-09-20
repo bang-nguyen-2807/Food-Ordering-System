@@ -34,7 +34,7 @@ export default function LoginCPN() {
       } else if(role === "SHIPPER") {
         window.location.href = "/shipper/dashboard";
       } else if(role === "CUSTOMER") {
-        window.location.href = "/customer/dashboard";
+        window.location.href = "/users/home";
       }else {
         window.location.href = "/";
       }

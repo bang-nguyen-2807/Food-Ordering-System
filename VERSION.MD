@@ -6,3 +6,7 @@ VERSION 1
                - general header url for otimization link api and head url
                - display location for shipper and restaurant
     UPDATE 3.1 - add topbar for restaurant and shipper
+    UPDATE 3.2 - create user page , api user
+               - user can see info user, add address, delete address and edit info user
+               - user can create order, view his orders , bill , see list restaurant
+               - get location for shipper and user

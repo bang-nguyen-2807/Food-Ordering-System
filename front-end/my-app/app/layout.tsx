@@ -39,7 +39,7 @@ export default function RootLayout({
           <Navbar />
 
           {/* Nội dung trang (children) */}
-          <main className="flex-1 p-6 md:p-8 overflow-y-auto">
+          <main className="flex-1 p-6 md:p-8">
             {children}
           </main>
         </div>

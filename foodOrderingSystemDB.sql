@@ -34,6 +34,7 @@ GO
 CREATE TABLE Restaurants(
 	RestaurantId INT IDENTITY(1,1) PRIMARY KEY,
 	RestaurantName NVARCHAR(255),
+    ImageUrl VARCHAR(300),
 	Addresses NVARCHAR(255),
     Latitude DECIMAL(10,7) NULL, -- vĩ độ
     Longitude DECIMAL(10,7) NULL, -- kinh độ
@@ -48,7 +49,9 @@ CREATE TABLE CategoriesRestaurant(
 	CategorieRestaurantsCode VARCHAR(30) NOT NULL,
 	Descriptions NVARCHAR(255) NULL,
 	ImageUrl VARCHAR(255) NULL,
-    FOREIGN KEY (RestaurantId) references Restaurants(RestaurantId)
+    CategoriesId INT ,
+    FOREIGN KEY (RestaurantId) references Restaurants(RestaurantId),
+    FOREIGN KEY (CategoriesId) references Categories(CategoriesId)
 )
 GO
 -- MENU ITEMS -- từng món ăn , giá từng món 
@@ -162,7 +165,8 @@ CREATE TABLE Cart(
     CartId INT IDENTITY(1,1) PRIMARY KEY,
     UserId INT NOT NULL UNIQUE,
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-
+    RestaurantId INT not null unique,
+    FOREIGN KEY (RestaurantId) REFERENCES Restaurants(RestaurantId),
     FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
 GO

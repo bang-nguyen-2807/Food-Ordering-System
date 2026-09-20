@@ -11,6 +11,10 @@ import DashboardRoutes from "../routes/restaurant/dashboard/dashboard.routes"
 import ManagerOrderRoutes from "../routes/restaurant/managerOrder/managerOrder.routes"
 import ManagerMenuRoutes from "../routes/restaurant/managerMenu/managerMenu.routes"
 import shipperDashboardRoutes from "../routes/shiper/dashboard/dashboard.routes"
+import HomeRoutes from "../routes/users/home/home.routes"
+import InfoRestaurantRoutes from "../routes/users/infoRestaurant/infoRestaurant.routes"
+import cartUserRoutes from "../routes/users/cartUser/cartUser.routes"
+import infoUserRoutes from "../routes/users/infoUser/infoUser.route"
 const rootRouter = Router();
 // middleware bảo vệ admin 
 //  ÁP DỤNG MIDDLEWARE BẢO VỆ CHO TOÀN BỘ NHÁNH /admin Ở ĐÂY:
@@ -31,6 +35,12 @@ rootRouter.use(
   authenticateToken,
   authorizeRoles("SHIPPER", "ADMIN")
 )
+// ÁP DỤNG MIDDLEWARE BẢO VỆ CHO NHÁNH NGƯỜI DÙNG
+rootRouter.use(
+  "/user",
+  authenticateToken,
+  authorizeRoles("CUSTOMER", "ADMIN")
+)
 // login
 rootRouter.use("/authentication" , LoginRoutes); // /api/authentication/login
 rootRouter.use("/authentication" , CreateAccount); // /api/authentication/createAccount
@@ -46,4 +56,9 @@ rootRouter.use("/restaurant/managerOrder" , ManagerOrderRoutes)
 rootRouter.use("/restaurant/managerMenu" , ManagerMenuRoutes)
 // shipper
 rootRouter.use("/shipper/dashboard" , shipperDashboardRoutes)
+// user
+rootRouter.use("/user/home" , HomeRoutes) // trang home /api/user/home/getListRestaurant?lat=10&lng=20
+rootRouter.use("/user/infoRestaurant" , InfoRestaurantRoutes) // trang chi tiết nhà hàng /api/user/infoRestaurant/getInfoRestaurant?RestaurantId=1&CategoriesId=1
+rootRouter.use("/user/cart" , cartUserRoutes) // trang giỏ hàng /api/user/cart/addItemsToCart?UserId=1&RestaurantId=1&MenuItemId=1&Quantity=1
+rootRouter.use("/user/info" , infoUserRoutes) // trang thông tin cá nhân /api/user/info/addAddress?UserId=1&AddressName=1&Addresses=1
 export default rootRouter;
