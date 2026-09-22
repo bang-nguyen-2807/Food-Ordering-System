@@ -21,4 +21,17 @@ export class InfoUserService{
     async UpdateInfoUser(req : Request){
         return this.infoUserRepo.UpdateInfoUser(req)
     }
+    async changePassword(UserId : string , oldPassword : string , newPassword : string){
+        const result = await this.infoUserRepo.changePassword(UserId , oldPassword , newPassword);
+        if(result){
+            return {
+                message : "Change password successfully",
+                success : true
+            }
+        }
+        return {
+            message : "Change password failed",
+            success : false
+        }
+    }
 }

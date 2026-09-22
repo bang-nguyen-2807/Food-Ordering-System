@@ -11,3 +11,4 @@ VERSION 1
                - user can create order, view his orders , bill , see list restaurant
                - get location for shipper and user
                - update UX/UI in infoUser page
+               - update for change password 

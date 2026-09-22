@@ -58,4 +58,16 @@ export class InfoUserRepo {
             { name: "UserId", type: sql.NVarChar(200), value: UserId }
         ]);
     }
+    async changePassword(UserId : string , oldPassword : string , newPassword : string){
+        const query = `
+            UPDATE Users
+            SET Password = @newPassword
+            WHERE UserId = @UserId AND Password = @oldPassword
+        `;
+        return DbHelpQueryRepo.excuteNonQuery(query, [
+            { name: "newPassword", type: sql.NVarChar(200), value: newPassword },
+            { name: "UserId", type: sql.Int, value: parseInt(UserId) },
+            { name: "oldPassword", type: sql.NVarChar(200), value: oldPassword }
+        ]);
+    }
 }

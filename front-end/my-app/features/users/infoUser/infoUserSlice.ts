@@ -15,6 +15,11 @@ export interface InfoUser {
     NumberPhone: string,
     Email: string
 }
+export interface changePassword{
+    UserId : string,
+    oldPassword : string,
+    newPassword : string
+}
 interface InitialState {
     dataUserAddress: InfoAddressUser[],
     addresses: fetchAddressUser[],
@@ -74,6 +79,16 @@ export const updateInfoUser = createAsyncThunk(
         }
     }
 )
+export const changePassword = createAsyncThunk(
+    "infoUserSlice/changePassword", async ({ UserId, oldPassword, newPassword }: { UserId: string, oldPassword: string, newPassword: string }, thunkAPI) => {
+        try {
+            return await otimizeSliceUpdate<changePassword>(`/user/info/changePassword`, thunkAPI, { UserId, oldPassword, newPassword })
+        } catch (err: any) {
+            return otimizeSliceError(err, thunkAPI, "Không thể đổi mật khẩu")
+        }
+    }
+)
+
 const infoUserSlice = createSlice({
     name: "infoUser",
     initialState,
@@ -134,6 +149,17 @@ const infoUserSlice = createSlice({
                 state.loading = false;
             })
             .addCase(updateInfoUser.rejected, (state) => {
+                state.loading = false;
+            })
+            // change password
+            .addCase(changePassword.pending, (state) => {
+                state.loading = true;
+                state.err = null;
+            })
+            .addCase(changePassword.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(changePassword.rejected, (state) => {
                 state.loading = false;
             })
     }

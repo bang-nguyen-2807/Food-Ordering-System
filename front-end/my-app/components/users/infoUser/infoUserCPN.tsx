@@ -1,13 +1,14 @@
 "use client"
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAddAddressUser, getInfoUser, getAddressUser, deleteAddressUser, updateInfoUser } from "@/features/users/infoUser/infoUserSlice";
+import { fetchAddAddressUser, getInfoUser, getAddressUser, deleteAddressUser, updateInfoUser , changePassword } from "@/features/users/infoUser/infoUserSlice";
 import { useEffect, useState, useRef } from "react";
 import LoadingSpinner from "@/components/spinner/loading";
 import ErrorSpinner from "@/components/spinner/error";
 import Modal from "@/components/modal/modal";
 
-import { User, MapPin, Edit3, Plus, Trash2, Home, Building, Phone, Mail } from "lucide-react";
+import Link from "next/link";
+import { User, MapPin, Edit3, Plus, Trash2, Home, Building, Phone, Mail, Lock, Key, ArrowLeft } from "lucide-react";
 
 export default function InfoUserCPN() {
     const dispatch = useDispatch<AppDispatch>();
@@ -35,6 +36,7 @@ export default function InfoUserCPN() {
     const [AddressName, setAddressName] = useState<string>("");
     const [Addresses, setAddresses] = useState<string>("");
     // -- Modal Add Address --
+
     // -- Modal edit Info User
     const [isOpenModalEditUser , setIsOpenModalEditUser] = useState<boolean>(false); // state manage close or open modal
     // state save value in input for modal
@@ -42,6 +44,16 @@ export default function InfoUserCPN() {
     const [editNumberPhone , setEditNumberPhone] = useState<string>("");
     const [editEmail , setEditEmail] = useState<string>("");
     // -- Modal edit Info User
+
+    // -- Modal change password
+    const [isOpenModalChangePassword , setIsOpenModalChangePassword] = useState<boolean>(false);
+    const [oldPassword , setOldPassword] = useState<string>("");
+    const [newPassword , setNewPassword] = useState<string>("");
+    const [confirmPassword , setConfirmPassword] = useState<string>("");
+    const [errorPassword , setErrorPassword] = useState<string>(""); // state to save notification error password
+    // -- Modal change password
+
+    // fetch data user
     useEffect(() => {
         if (UserId) {
             dispatch(getAddressUser({ UserId: String(UserId) })).unwrap()
@@ -120,6 +132,41 @@ export default function InfoUserCPN() {
             console.error("Lỗi khi update thông tin người dùng:", error);
         }
     }
+    // function open modal changePassword
+    const handleOpenModalChangePassword = () => {
+        setIsOpenModalChangePassword(true);
+    }
+    // function change password after click button đổi mật khẩu
+    const handleChangePassword = async()=>{
+        setErrorPassword("");
+        if(!oldPassword.trim() || !newPassword.trim() || !confirmPassword.trim()){// . trim để xóa khoảng trắng đầu đuôi
+            setErrorPassword("Vui lòng nhập đầy đủ thông tin mật khẩu")
+            return;
+        }
+        if(newPassword !== confirmPassword){
+            setErrorPassword("Mật khẩu mới không khớp!");
+            return;
+        }
+        // if(newPassword.length < 6){
+        //     setErrorPassword("Mật khẩu mới phải có ít nhất 6 ký tự");
+        //     return;
+        // }
+        // if(newPassword === oldPassword){
+        //     setErrorPassword("Mật khẩu mới phải khác mật khẩu cũ");
+        //     return;
+        // }
+        try{
+            await dispatch(changePassword({UserId : String(UserId) , oldPassword : oldPassword , newPassword : newPassword})).unwrap();
+            setErrorPassword("Đổi mật khẩu thành công!");
+            setIsOpenModalChangePassword(false); // đóng modal
+            setOldPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+        }catch(error : any){
+            const err = typeof error === "string" ? error : (error.message || "Đổi mật khẩu thất bại!");
+            setErrorPassword(err);
+        }
+    }
     const [isMounted, setIsMounted] = useState<boolean>(false);
     useEffect(() => {
         setIsMounted(true);
@@ -145,58 +192,78 @@ export default function InfoUserCPN() {
 
     return (
         <div className="min-h-screen bg-[#F8F9FA] py-8 px-4 sm:px-6 lg:px-8 font-sans">
-            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
-                {/* ---------- LEFT SIDEBAR CARD ---------- */}
-                <div className="w-full lg:w-72 bg-white rounded-3xl p-6 shadow-xs border border-gray-100/80 flex flex-col gap-6 self-start sticky top-6">
-                    {/* User Profile Summary */}
-                    <div className="text-center">
-                        <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-tr from-amber-100 to-orange-100 border-4 border-white shadow-md flex items-center justify-center">
-                            <span className="text-3xl font-extrabold text-orange-500">
-                                {userInitial}
-                            </span>
-                        </div>
-                        <h2 className="font-bold text-gray-900 text-lg mt-3.5 tracking-tight">
-                            {displayName}
-                        </h2>
-                        <p className="text-xs text-gray-400 font-medium mt-0.5 truncate">
-                            {displayEmail}
-                        </p>
-                        <div className="mt-3">
-                            <span className="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 text-[11px] font-semibold rounded-full border border-amber-200/60 shadow-2xs">
-                                Thành viên Vàng
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="h-px bg-gray-100 my-1" />
-
-                    {/* Navigation Items */}
-                    <nav className="flex flex-col gap-1.5">
-                        <button
-                            onClick={scrollToInfo}
-                            className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
-                                activeTab === "info"
-                                    ? "bg-orange-50/80 text-orange-600 shadow-2xs"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                            }`}
-                        >
-                            <User className={`w-5 h-5 ${activeTab === "info" ? "text-orange-500" : "text-gray-400"}`} />
-                            <span>Thông tin tài khoản</span>
-                        </button>
-
-                        <button
-                            onClick={scrollToAddress}
-                            className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
-                                activeTab === "address"
-                                    ? "bg-orange-50/80 text-orange-600 shadow-2xs"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                            }`}
-                        >
-                            <MapPin className={`w-5 h-5 ${activeTab === "address" ? "text-orange-500" : "text-gray-400"}`} />
-                            <span>Địa chỉ đã lưu</span>
-                        </button>
-                    </nav>
+            <div className="max-w-7xl mx-auto flex flex-col gap-5">
+                {/* ---------- TOP BACK BUTTON TO HOME ---------- */}
+                <div className="flex items-center justify-between">
+                    <Link
+                        href="/users/home"
+                        className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white hover:bg-orange-500 text-gray-700 hover:text-white font-semibold text-sm border border-gray-100/80 shadow-2xs hover:shadow-md hover:shadow-orange-500/20 active:scale-95 transition-all duration-200 cursor-pointer group"
+                    >
+                        <ArrowLeft className="w-4 h-4 text-orange-500 group-hover:text-white group-hover:-translate-x-1 transition-all duration-200" />
+                        <span>Quay về trang chủ</span>
+                    </Link>
                 </div>
+
+                <div className="flex flex-col lg:flex-row gap-6">
+                    {/* ---------- LEFT SIDEBAR CARD ---------- */}
+                    <div className="w-full lg:w-72 bg-white rounded-3xl p-6 shadow-xs border border-gray-100/80 flex flex-col gap-6 self-start sticky top-6">
+                        {/* User Profile Summary */}
+                        <div className="text-center">
+                            <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden bg-gradient-to-tr from-amber-100 to-orange-100 border-4 border-white shadow-md flex items-center justify-center">
+                                <span className="text-3xl font-extrabold text-orange-500">
+                                    {userInitial}
+                                </span>
+                            </div>
+                            <h2 className="font-bold text-gray-900 text-lg mt-3.5 tracking-tight">
+                                {displayName}
+                            </h2>
+                            <p className="text-xs text-gray-400 font-medium mt-0.5 truncate">
+                                {displayEmail}
+                            </p>
+                            <div className="mt-3">
+                                <span className="inline-flex items-center px-3 py-1 bg-amber-50 text-amber-600 text-[11px] font-semibold rounded-full border border-amber-200/60 shadow-2xs">
+                                    Thành viên Vàng
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="h-px bg-gray-100 my-1" />
+
+                        {/* Navigation Items */}
+                        <nav className="flex flex-col gap-1.5">
+                            <Link
+                                href="/users/home"
+                                className="flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm text-gray-500 hover:bg-orange-50/80 hover:text-orange-600 transition-all text-left w-full cursor-pointer group"
+                            >
+                                <Home className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" />
+                                <span>Trang chủ</span>
+                            </Link>
+
+                            <button
+                                onClick={scrollToInfo}
+                                className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
+                                    activeTab === "info"
+                                        ? "bg-orange-50/80 text-orange-600 shadow-2xs"
+                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                }`}
+                            >
+                                <User className={`w-5 h-5 ${activeTab === "info" ? "text-orange-500" : "text-gray-400"}`} />
+                                <span>Thông tin tài khoản</span>
+                            </button>
+
+                            <button
+                                onClick={scrollToAddress}
+                                className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
+                                    activeTab === "address"
+                                        ? "bg-orange-50/80 text-orange-600 shadow-2xs"
+                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                }`}
+                            >
+                                <MapPin className={`w-5 h-5 ${activeTab === "address" ? "text-orange-500" : "text-gray-400"}`} />
+                                <span>Địa chỉ đã lưu</span>
+                            </button>
+                        </nav>
+                    </div>
 
                 {/* ---------- RIGHT CONTENT AREA ---------- */}
                 <div className="flex-1 flex flex-col gap-6">
@@ -214,7 +281,7 @@ export default function InfoUserCPN() {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                             <div>
                                 <p className="text-xs text-gray-400 font-medium mb-1">Họ và tên</p>
                                 <p className="text-sm sm:text-base font-bold text-gray-900">
@@ -234,6 +301,20 @@ export default function InfoUserCPN() {
                                 <p className="text-sm sm:text-base font-bold text-gray-900 break-all">
                                     {displayEmailFull}
                                 </p>
+                            </div>
+
+                            <div>
+                                <p className="text-xs text-gray-400 font-medium mb-1">Mật khẩu</p>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm sm:text-base font-bold text-gray-900">••••••••</span>
+                                    <button
+                                        onClick={handleOpenModalChangePassword}
+                                        className="text-xs font-semibold text-orange-500 hover:text-orange-600 hover:underline flex items-center gap-1 cursor-pointer transition ml-1"
+                                    >
+                                        <Lock className="w-3.5 h-3.5" />
+                                        <span>Đổi mật khẩu</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -425,6 +506,86 @@ export default function InfoUserCPN() {
                     </div>
                 </div>
             </Modal>
+            {/* ---------- MODAL CHANGE PASSWORD ---------- */}
+            <Modal
+                isOpen={isOpenModalChangePassword}
+                onClose={() => setIsOpenModalChangePassword(false)}
+                title="Đổi mật khẩu"
+                description="Cập nhật mật khẩu mới cho tài khoản của bạn"
+                maxWidth="md"
+            >
+                <div className="flex flex-col gap-4 mt-2">
+                    {/* message lỗi */}
+                    {errorPassword && (
+                        <div className="p-3 bg-red-50 border border-red-200 text-red-600 text-xs font-semibold rounded-xl">
+                            ⚠️ {errorPassword}
+                        </div>
+                    )}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Mật khẩu cũ
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
+                                type="password"
+                                placeholder="Nhập mật khẩu cũ"
+                                value={oldPassword}
+                                onChange={(e) => setOldPassword(e.target.value)}
+                            />
+                            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Mật khẩu mới
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
+                                type="password"
+                                placeholder="Nhập mật khẩu mới"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
+                            Xác nhận mật khẩu mới
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-900 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition"
+                                type="password"
+                                placeholder="Nhập lại mật khẩu mới"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+                        <button
+                            onClick={() => setIsOpenModalChangePassword(false)}
+                            className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold text-sm transition cursor-pointer"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            onClick={handleChangePassword}
+                            className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm shadow-md shadow-orange-500/20 active:scale-98 transition cursor-pointer"
+                        >
+                            Đổi mật khẩu
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+            </div>
         </div>
     );
 }

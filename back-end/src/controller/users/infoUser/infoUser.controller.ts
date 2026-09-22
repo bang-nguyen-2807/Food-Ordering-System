@@ -73,4 +73,26 @@ export class InfoUserController{
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "Internal server error"});
         }
     }
+    changePassword = async(req : Request , res : Response)=>{
+        try{
+            const {UserId , oldPassword , newPassword} = req.body;
+            if(!UserId || !oldPassword || !newPassword){
+                return res.status(StatusCodes.BAD_REQUEST).json({message : "Thiếu thông tin"})
+            }
+            if(newPassword.length < 6){ // check password must >= 6
+                return res.status(StatusCodes.BAD_REQUEST).json({message : "Mật khẩu mới phải có ít nhất 6 ký tự"})
+            }
+            if(newPassword === oldPassword){
+                return res.status(StatusCodes.BAD_REQUEST).json({message : "Mật khẩu mới phải khác mật khẩu cũ"})
+            }
+            const result = await this.infoUserService.changePassword(UserId , oldPassword , newPassword);
+            if (!result.success) {
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: result.message });
+            }
+            return res.status(StatusCodes.OK).json(result);
+        }catch(err){
+            console.log(err);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "Internal server error"});
+        }
+    }
 }
