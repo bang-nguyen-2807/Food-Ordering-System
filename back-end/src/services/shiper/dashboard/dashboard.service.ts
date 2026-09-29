@@ -19,4 +19,8 @@ export class DashboardService {
         const result = await this.dashboardRepo.getAvailableDeliveries(UserId, radiusMeter);
         return result;
     }
+    async updateOrderIdForShipper(OrderId:string,UserId:string){
+        const result = await this.dashboardRepo.updateOrderIdForShipper(OrderId,UserId);
+        return result;
+    }
 }

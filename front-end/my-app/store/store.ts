@@ -10,6 +10,8 @@ import restaurantDashboardSlice from "../features/restaurant/dashboard/dashboard
 import restaurantManagerOrderSlice from "../features/restaurant/managerOrder/managerOrderSlice"
 import restaurantManagerMenuSlice from "../features/restaurant/managerMenu/managerMenuSlice"
 import dashboardShipperSlice from "../features/shipper/dashboard/dashboardSlice"
+import navbarShipperSlice from "../features/shipper/navbar/navbarSlice"
+import deliveringSlice from "../features/shipper/delivering/deliveringSlice"
 import homeUserSlice from "../features/users/home/HomeSlice"
 import infoRestaurantSlice from "../features/users/infoRestaurant/infoRestaurantSlice"
 import cartUserSlice from "../features/users/cartUser/cartUserSlice"
@@ -30,6 +32,8 @@ export const store = configureStore({
     restaurantManagerMenu : restaurantManagerMenuSlice,
     // shipper
     dashboardShipper : dashboardShipperSlice,
+    navbarShipper : navbarShipperSlice,
+    delivering : deliveringSlice,
     // user
     homeUser : homeUserSlice,
     infoRestaurant : infoRestaurantSlice,

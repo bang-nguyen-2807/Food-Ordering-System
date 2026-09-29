@@ -11,6 +11,8 @@ import DashboardRoutes from "../routes/restaurant/dashboard/dashboard.routes"
 import ManagerOrderRoutes from "../routes/restaurant/managerOrder/managerOrder.routes"
 import ManagerMenuRoutes from "../routes/restaurant/managerMenu/managerMenu.routes"
 import shipperDashboardRoutes from "../routes/shiper/dashboard/dashboard.routes"
+import OrderingRoutes from "../routes/shiper/ordering/ordering.routes"
+import shipperNavbarRoutes from "../routes/shiper/navbar/navbar.routes"
 import HomeRoutes from "../routes/users/home/home.routes"
 import InfoRestaurantRoutes from "../routes/users/infoRestaurant/infoRestaurant.routes"
 import cartUserRoutes from "../routes/users/cartUser/cartUser.routes"
@@ -56,6 +58,8 @@ rootRouter.use("/restaurant/managerOrder" , ManagerOrderRoutes)
 rootRouter.use("/restaurant/managerMenu" , ManagerMenuRoutes)
 // shipper
 rootRouter.use("/shipper/dashboard" , shipperDashboardRoutes)
+rootRouter.use("/shipper/ordering" , OrderingRoutes) // giao hàng của shipper
+rootRouter.use("/shipper/navbar" , shipperNavbarRoutes)
 // user
 rootRouter.use("/user/home" , HomeRoutes) // trang home /api/user/home/getListRestaurant?lat=10&lng=20
 rootRouter.use("/user/infoRestaurant" , InfoRestaurantRoutes) // trang chi tiết nhà hàng /api/user/infoRestaurant/getInfoRestaurant?RestaurantId=1&CategoriesId=1

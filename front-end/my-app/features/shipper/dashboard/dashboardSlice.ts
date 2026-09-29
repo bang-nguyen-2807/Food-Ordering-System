@@ -17,6 +17,10 @@ interface UpdateShipperLocation{
     longitude : string;
     latitude : string;
 }
+export interface UpdateOrderIdForShipper{
+    OrderId : string;
+    UserId : string;
+}
 interface GetAvailableDeliveries{
     UserId : string;
     radiusMeter : string;
@@ -68,6 +72,16 @@ export const getAvailableDeliveries = createAsyncThunk(
         }
     }
 )
+export const fetchUpdateOrderIdForShipper = createAsyncThunk(
+    "dashboardShipper/fetchUpdateOrderIdForShipper" , async({OrderId , UserId} : UpdateOrderIdForShipper , thunkAPI)=>{
+        try{
+            return await otimizeSliceUpdate<string[]>(`/shipper/dashboard/updateOrderIdForShipper` , thunkAPI , {OrderId , UserId})
+        }
+        catch(err){
+            return otimizeSliceError(err , thunkAPI , "Không thể cập nhật thông tin đơn hàng")
+        }
+    }
+)
 const dashboardShipperSlice = createSlice({
     name: "dashboardShipper",
     initialState,
@@ -111,6 +125,17 @@ const dashboardShipperSlice = createSlice({
         .addCase(getAvailableDeliveries.rejected , (state , action)=>{
             state.loading = false;
             state.err = action.payload as string;
+        })
+        // fetchUpdateOrderIdForShipper
+        .addCase(fetchUpdateOrderIdForShipper.pending , (state)=>{
+            state.loading = true;
+            state.err = null;
+        })
+        .addCase(fetchUpdateOrderIdForShipper.fulfilled , (state , action)=>{
+            state.loading = false;
+        })
+        .addCase(fetchUpdateOrderIdForShipper.rejected , (state , action)=>{
+            state.loading = false;
         })
     }
 })

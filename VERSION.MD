@@ -12,3 +12,10 @@ VERSION 1
                - get location for shipper and user
                - update UX/UI in infoUser page
                - update for change password 
+    UPDATE 3.3 - create shipper delivering page 
+               - shipper can see list order
+               - shipper can get location 
+               - itegrate map with leaflet for shipper can get route and location
+               - update status deliveries for shipper
+               - change status when click button nhận đơn hàng . next status 
+               

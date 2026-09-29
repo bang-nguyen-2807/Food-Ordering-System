@@ -19,6 +19,10 @@ import {
   History
 } from "lucide-react";
 import LogoutModal from "@/components/authentication/logout/LogoutModal";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import type { RootState, AppDispatch } from "@/store/store";
+import { store } from "@/store/store";
+import { fetchActiveDeliveryOrder } from "@/features/shipper/navbar/navbarSlice";
 
 interface NavItem {
   title: string;
@@ -27,17 +31,35 @@ interface NavItem {
   badge?: string;
 }
 
-export default function Navbar() {
+function NavbarContent() {
+  const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [hasToken, setHasToken] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+
+  const { user } = useSelector((state: RootState) => state.login);
+  const { infoActiveOrder } = useSelector((state: RootState) => state.navbarShipper);
+  const UserId = String(user?.UserId || "");
 
   useEffect(() => {
     setIsMounted(true);
     const token = localStorage.getItem("accessToken");
     setHasToken(!!token);
-  }, []);
+    const orderId = localStorage.getItem("activeOrderId");
+    setActiveOrderId(orderId);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (UserId && pathname?.startsWith("/shipper")) {
+      dispatch(fetchActiveDeliveryOrder(UserId));
+    }
+  }, [UserId, pathname, dispatch]);
+
+  const currentOrderId = infoActiveOrder && infoActiveOrder[0]?.OrderId
+    ? String(infoActiveOrder[0].OrderId)
+    : activeOrderId;
 
   // 1. Tránh đè giao diện SSR & Ẩn Navbar khi CHƯA ĐĂNG NHẬP (chưa có token)
   if (!isMounted || !hasToken) {
@@ -166,7 +188,7 @@ export default function Navbar() {
       },
       {
         title: "Đơn hàng đang giao",
-        href: "/shipper/delivering",
+        href: currentOrderId ? `/shipper/delivering/${currentOrderId}` : "/shipper/delivering",
         icon: Truck,
       },
       {
@@ -424,5 +446,13 @@ export default function Navbar() {
         onClose={() => setIsLogoutModalOpen(false)}
       />
     </>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Provider store={store}>
+      <NavbarContent />
+    </Provider>
   );
 }

@@ -50,4 +50,18 @@ export class DashboardController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message || "Lỗi máy chủ khi lấy danh sách đơn" });
         }
     }
+    updateOrderIdForShipper = async (req: Request, res: Response) => {
+        try {
+            const OrderId = req.body.OrderId as string;
+            const UserId = req.body.UserId as string;
+            if (!OrderId || !UserId) {
+                return res.status(StatusCodes.BAD_REQUEST).json("missing data")
+            }
+            const result = await this.dashboardService.updateOrderIdForShipper(OrderId, UserId);
+            return res.status(StatusCodes.OK).json(result);
+        } catch (error: any) {
+            console.error("Lỗi updateOrderIdForShipper:", error);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message || "Lỗi máy chủ khi cập nhật đơn" });
+        }
+    }
 }

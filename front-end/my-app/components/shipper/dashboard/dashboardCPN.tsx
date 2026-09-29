@@ -7,6 +7,7 @@ import {
   fetchTotalOrder,
   getAvailableDeliveries,
   fetchUpdateShipperLocation,
+  fetchUpdateOrderIdForShipper,
 } from "@/features/shipper/dashboard/dashboardSlice";
 import LoadingSpinner from "@/components/spinner/loading";
 import ErrorSpinner from "@/components/spinner/error";
@@ -27,6 +28,7 @@ import {
 } from "lucide-react";
 import { fetchAddressFromOSM } from "@/features/util/location";
 import ShipperLocation from "@/components/location/shipper/shiperLocation";
+import { useRouter } from "next/navigation";
 export default function DashboardCPN() {
   const dispatch = useDispatch<AppDispatch>();
   const { infoDashboardOrderShipper, infoTotal, loading, err } = useSelector(
@@ -39,7 +41,7 @@ export default function DashboardCPN() {
   const [nameLocation, setNameLocation] = useState<string>("");
   const UserId = String(user?.UserId || ""); // lấy userId
   const apiKey = process.env.NEXT_PUBLIC_API_KEY as string;
-
+  const router = useRouter();
   useEffect(() => {
     if (UserId) {
       dispatch(fetchTotalOrder(String(UserId)));
@@ -107,6 +109,23 @@ export default function DashboardCPN() {
   }
   if (err) {
     return <ErrorSpinner message={err} />;
+  }
+  // 394 is button receive orderr
+  // update orderId when shipper receive order
+  const handleUpdateReceiveOrder = async (OrderId: string) => {
+    try {
+      if (!UserId) {
+        alert("Vui lòng đăng nhập lại để nhận đơn hàng!");
+        return;
+      }
+      await dispatch(fetchUpdateOrderIdForShipper({ OrderId, UserId })).unwrap();
+      localStorage.setItem("activeOrderId", OrderId);
+      router.push(`/shipper/delivering/${OrderId}`);
+    }
+    catch (err: any) {
+      console.error("--> Lỗi khi cập nhật đơn hàng:", err);
+      alert(err || "Lỗi khi nhận đơn hàng!");
+    }
   }
 
   const totalOrdersCount =
@@ -300,7 +319,7 @@ export default function DashboardCPN() {
 
         {/* Grid Đơn Hàng */}
         {!infoDashboardOrderShipper ||
-        infoDashboardOrderShipper.length === 0 ? (
+          infoDashboardOrderShipper.length === 0 ? (
           <div className="bg-white rounded-3xl p-10 border border-gray-100 shadow-xs text-center flex flex-col items-center justify-center gap-3">
             <div className="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center">
               <MapPin className="w-7 h-7 text-orange-500" />
@@ -322,7 +341,6 @@ export default function DashboardCPN() {
               const earnings = item.TotalPrice
                 ? Number(item.TotalPrice).toLocaleString("vi-VN")
                 : "0";
-
               return (
                 <div
                   key={item.DeliveriesId || index}
@@ -390,7 +408,7 @@ export default function DashboardCPN() {
                       </div>
                     </div>
 
-                    <button className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-bold py-3.5 rounded-2xl transition shadow-md shadow-orange-500/20 cursor-pointer text-sm">
+                    <button onClick={() => handleUpdateReceiveOrder(String(item.OrderId))} className="w-full bg-orange-500 hover:bg-orange-600 active:scale-[0.99] text-white font-bold py-3.5 rounded-2xl transition shadow-md shadow-orange-500/20 cursor-pointer text-sm">
                       Nhận Đơn Hàng Này
                     </button>
                   </div>

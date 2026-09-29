@@ -55,4 +55,19 @@ export class DashboardRepo {
         ]
         )
     }
+    async updateOrderIdForShipper(OrderId:string,UserId:string){
+        let query = `
+                DECLARE @ShipperId INT;
+                SELECT @ShipperId = ShipperId FROM Shipper WHERE UserId = @UserId;
+                UPDATE Deliveries
+                SET ShipperId = @ShipperId,
+                    DeliveryStatus = 'ACCEPTED'
+                WHERE OrderId = @OrderId AND (ShipperId IS NULL OR ShipperId = @ShipperId);
+        `    
+        return DbHelpQueryRepo.excuteNonQuery(query , [
+            {name:"OrderId",type:sql.Int,value:OrderId},
+            {name:"UserId",type:sql.Int,value:UserId}
+        ])
+            
+    }
 }
