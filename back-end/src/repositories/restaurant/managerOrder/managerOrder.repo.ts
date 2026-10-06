@@ -66,9 +66,15 @@ export class ManagerOrderRepo{
         const query = `
             UPDATE Orders
             SET OrderStatus = @OrderStatus
-            WHERE OrderId = @OrderId
+            WHERE OrderId = @OrderId;
+
+            IF @OrderStatus = 'READY_FOR_PICKUP' AND NOT EXISTS (SELECT 1 FROM Deliveries WHERE OrderId = @OrderId)
+            BEGIN
+                INSERT INTO Deliveries (DeliveriesCode, OrderId, ShipperId, DeliveryStatus)
+                VALUES (CONCAT('DEL-', @OrderId), @OrderId, NULL, 'FINDING_DRIVER');
+            END
         `;
-        return DbHelpQueryRepo.excuteQuery(query, [
+        return DbHelpQueryRepo.excuteNonQuery(query, [
             { name: "OrderId", type: sql.Int, value: OrderId },
             { name: "OrderStatus", type: sql.NVarChar, value: OrderStatus }
         ]);

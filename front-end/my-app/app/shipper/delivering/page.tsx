@@ -22,14 +22,19 @@ function DeliveringIndexContent() {
   }, [UserId, dispatch]);
 
   useEffect(() => {
-    const activeFromRedux = infoActiveOrder && infoActiveOrder[0]?.OrderId
-      ? String(infoActiveOrder[0].OrderId)
-      : null;
-    const activeFromLocal = typeof window !== "undefined" ? localStorage.getItem("activeOrderId") : null;
-    const activeOrderId = activeFromRedux || activeFromLocal;
-
-    if (activeOrderId) {
-      router.replace(`/shipper/delivering/${activeOrderId}`);
+    if (infoActiveOrder) {
+      if (infoActiveOrder.length > 0 && infoActiveOrder[0]?.OrderId) {
+        const activeOrderId = String(infoActiveOrder[0].OrderId);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("activeOrderId", activeOrderId);
+        }
+        router.replace(`/shipper/delivering/${activeOrderId}`);
+      } else {
+        // Hết đơn -> Xóa localStorage để không tự động chuyển hướng lại đơn cũ
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("activeOrderId");
+        }
+      }
     }
   }, [infoActiveOrder, router]);
 

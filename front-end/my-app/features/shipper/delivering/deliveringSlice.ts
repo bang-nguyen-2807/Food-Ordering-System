@@ -17,6 +17,13 @@ export interface DeliveryStatus{
     FAILED : string,
     CANCELLED : string
 }
+export interface StatusOrder{
+    StatusOrder : string
+}
+export interface LocationRestaurant{
+    laRes : number, 
+    lngRes : number
+}
 interface InfoRoute{
     RestaurantName : string,
     RestaurantAddress : string,
@@ -26,12 +33,16 @@ interface InfoRoute{
 interface initialState {
     DeliveriesOrderDetail: DeliveriesOrderDetail[],
     InfoRoute : InfoRoute[],
+    LocationRestaurant : LocationRestaurant[],
+    StatusOrder : StatusOrder[],
     loading: boolean,
     error: string | null
 }
 const initialState: initialState = {
     DeliveriesOrderDetail: [],
     InfoRoute : [],
+    LocationRestaurant : [],
+    StatusOrder : [],
     loading: false,
     error: null
 }
@@ -62,6 +73,26 @@ export const getInfoRoute = createAsyncThunk( // get info route(lộ trình) for
         }
         catch (err) {
             return otimizeSliceError(err, thunkAPI, "Không thể lấy thông tin lộ trình")
+        }
+    }
+)
+export const getLocationRestaurant = createAsyncThunk( // get location restaurant for shipper deliveries 
+    "delivering/getLocationRestaurant", async ({ OrderId }: { OrderId: string }, thunkAPI) => {
+        try {
+            return await otimizeSliceGET<LocationRestaurant[]>(`/shipper/ordering/getLocationRestaurant?OrderId=${OrderId}`, thunkAPI)
+        }
+        catch (err) {
+            return otimizeSliceError(err, thunkAPI, "Không thể lấy thông tin vị trí nhà hàng")
+        }
+    }
+)
+export const getOrderStatus = createAsyncThunk( // get status order for shipper deliveries 
+    "delivering/getOrderStatus", async ({ UserId, OrderId }: { UserId: string, OrderId: string }, thunkAPI) => {
+        try {
+            return await otimizeSliceGET<StatusOrder[]>(`/shipper/ordering/getOrderStatus?UserId=${UserId}&OrderId=${OrderId}`, thunkAPI)
+        }
+        catch (err) {
+            return otimizeSliceError(err, thunkAPI, "Không thể lấy thông tin trạng thái đơn hàng")
         }
     }
 )
@@ -104,6 +135,30 @@ const deliveringSlice = createSlice({
                 state.InfoRoute = action.payload;
             })
             .addCase(getInfoRoute.rejected, (state, action) => {
+                state.loading = false;
+            })
+            // getLocationRestaurant
+            .addCase(getLocationRestaurant.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getLocationRestaurant.fulfilled, (state, action) => {
+                state.loading = false;
+                state.LocationRestaurant = action.payload;
+            })
+            .addCase(getLocationRestaurant.rejected, (state, action) => {
+                state.loading = false;
+            })
+            // getOrderStatus
+            .addCase(getOrderStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrderStatus.fulfilled, (state, action) => {
+                state.loading = false;
+                state.StatusOrder = action.payload;
+            })
+            .addCase(getOrderStatus.rejected, (state, action) => {
                 state.loading = false;
             })
     }

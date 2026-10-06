@@ -17,4 +17,10 @@ export class OrderingService{
     async infoRoute(UserId : string , OrderId : string) {// get info route(lộ trình) for shipper deliveries
         return await this.orderingRepo.infoRoute(UserId , OrderId);
     }
+    async getLocationRestaurant(OrderId : string){
+        return await this.orderingRepo.getLocationRestaurant(OrderId);
+    }
+    async getStatusOrder(OrderId : string , UserId : string){
+        return await this.orderingRepo.getStatusOrder(OrderId , UserId);
+    }
 }

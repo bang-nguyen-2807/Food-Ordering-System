@@ -18,4 +18,6 @@ VERSION 1
                - itegrate map with leaflet for shipper can get route and location
                - update status deliveries for shipper
                - change status when click button nhận đơn hàng . next status 
+    UPDATE 4   - add a function find the way for shipper to restaurant 
+               - update click at managerOrder. when click update dbo.deliveries. it will update status 
                

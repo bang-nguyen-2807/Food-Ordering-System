@@ -5,9 +5,10 @@ import { useDispatch, useSelector } from "react-redux"
 import type { RootState, AppDispatch } from "@/store/store"
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { fetchUpdateShipperLocation } from "@/features/shipper/dashboard/dashboardSlice";// use update location shipper in database
 import { Truck, MapPin, Navigation } from "lucide-react";
-import { getDeliveriesOrderDetail, updateNextStatusOrder , getInfoRoute } from "@/features/shipper/delivering/deliveringSlice";
+import { getDeliveriesOrderDetail, updateNextStatusOrder, getInfoRoute, getLocationRestaurant, getOrderStatus } from "@/features/shipper/delivering/deliveringSlice";
 import LoadingSpinner from "@/components/spinner/loading";
 import ErrorSpinner from "@/components/spinner/error";
 
@@ -29,32 +30,39 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
     const dispatch = useDispatch<AppDispatch>();
     const orderId = OrderId;
 
-    const [latitude, setLatitude] = useState<number>(10.7769);
-    const [longitude, setLongitude] = useState<number>(106.7009);
+    const [latitude, setLatitude] = useState<number | null>(null);
+    const [longitude, setLongitude] = useState<number | null>(null);
     const { user } = useSelector((state: RootState) => state.login);// get UserId in RTK
-    const { DeliveriesOrderDetail , InfoRoute , loading, error } = useSelector((state: RootState) => state.delivering)
+    const { DeliveriesOrderDetail, InfoRoute, LocationRestaurant, StatusOrder, loading, error } = useSelector((state: RootState) => state.delivering)
     const UserId = String(user?.UserId || "");
     // get detail data delivery order 
     useEffect(() => {
-        dispatch(getDeliveriesOrderDetail({ UserId: UserId, OrderId: String(orderId) }))
-        dispatch(getInfoRoute({ UserId: UserId, OrderId: String(orderId) }))
+        dispatch(getDeliveriesOrderDetail({ UserId: UserId, OrderId: String(orderId) })) // chi tiết đơn hàng
+        dispatch(getInfoRoute({ UserId: UserId, OrderId: String(orderId) })) // thông tin tuyến đường
+        dispatch(getLocationRestaurant({ OrderId: String(orderId) })) // vị trí nhà hàng
+        dispatch(getOrderStatus({ UserId: UserId, OrderId: String(orderId) })) // trạng thái đơn hàng
     }, [UserId, orderId])
 
     // Update status deliveries for shipper
     const handleNextStatus = async () => {
         await dispatch(updateNextStatusOrder({ UserId: UserId, OrderId: String(orderId) }));
+        dispatch(getOrderStatus({ UserId, OrderId })); 
         dispatch(getDeliveriesOrderDetail({ UserId, OrderId })); // load lại đơn hàng sau khi update
+        dispatch(getLocationRestaurant({ OrderId }));  
     }
     //  return to dashboard page when shipper complete order
     useEffect(() => {
         if (DeliveriesOrderDetail.length > 0 && DeliveriesOrderDetail[0].DeliveryStatus === 'DELIVERED') {
+            if (typeof window !== "undefined") {
+                localStorage.removeItem("activeOrderId");
+            }
             const timer = setTimeout(() => {
                 router.push('/shipper/dashboard');
             }, 3000); // 3 giây sau tự về dashboard
             return () => clearTimeout(timer);
         }
     }, [DeliveriesOrderDetail, router]);
-    useEffect(() => {
+    useEffect(() => { // lấy vị trí của shipper
         let watchId: number;
         if (navigator.geolocation) {
             watchId = navigator.geolocation.watchPosition(
@@ -65,13 +73,13 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
                 (error) => {
                     console.warn("Cảnh báo Geolocation:", error.message);
                 },
-                { 
+                {
                     enableHighAccuracy: true, // Ưu tiên dùng GPS chính xác cao
                     timeout: 10000,
                     maximumAge: 5000, // Dùng dữ liệu cũ trong 5 giây để tiết kiệm pin
                 }
             );
-            if (UserId) {
+            if (UserId && latitude !== null && longitude !== null) {
                 dispatch(
                     fetchUpdateShipperLocation({
                         UserId,
@@ -88,12 +96,15 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
             if (watchId !== undefined) navigator.geolocation.clearWatch(watchId);
         };
     }, [UserId]);
+    // get location restaurant 
     if (loading) {
         return <LoadingSpinner />
     }
     if (error) {
         return <ErrorSpinner message={error} />
     }
+    console.log("StatusOrder hiện tại:", StatusOrder[0]);
+console.log("LocationRestaurant hiện tại:", LocationRestaurant);
     return (
         <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
             {/* Header Trang Đơn Hàng */}
@@ -124,17 +135,59 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
                                 <span className="text-sm font-bold text-gray-800">Bản đồ lộ trình</span>
                             </div>
                             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-700">
-                                GPS: {latitude.toFixed(4)}, {longitude.toFixed(4)}
+                                GPS: {latitude !== null && longitude !== null ? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` : "Đang định vị..."}
                             </span>
                         </div>
                         <div className="w-full h-[400px] md:h-[460px] rounded-2xl overflow-hidden border border-gray-100 relative">
-                            <MapLeaflet
-                                lat={latitude}
-                                lng={longitude}
-                                zoom={15}
-                                width="100%"
-                                height="100%"
-                            />
+                            {
+                                latitude === null || longitude === null ? (
+                                    <div className="flex items-center justify-center h-full bg-gray-50 text-gray-400 text-sm font-medium animate-pulse">
+                                        🛰️ Đang xác định vị trí GPS của bạn...
+                                    </div>
+                                ) : (
+                                    // Trường hợp 1: Trạng thái là ACCEPTED (Hướng tới Nhà Hàng)
+                                    StatusOrder.length > 0 && StatusOrder[0].StatusOrder === 'ACCEPTED' ? (
+                                        LocationRestaurant && LocationRestaurant.length > 0 ? (
+                                            <MapLeaflet
+                                                latShip={latitude}
+                                                lngShip={longitude}
+                                                latRes={LocationRestaurant[0].laRes}
+                                                lngRes={LocationRestaurant[0].lngRes}
+                                                zoom={15}
+                                                width="100%"
+                                                height="100%"
+                                            />
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full bg-gray-50 text-gray-400 text-sm font-medium">
+                                                Đang tải vị trí nhà hàng...
+                                            </div>
+                                        )
+                                    ) :
+                                        // Trường hợp 2: Trạng thái từ ARRIVED_AT_STORE trở đi (Hướng tới Khách Hàng)
+                                        ['ARRIVED_AT_STORE', 'PICKED_UP', 'ARRIVED_AT_BUYER'].includes(StatusOrder[0]?.StatusOrder) ? (
+                                            LocationRestaurant && LocationRestaurant.length > 0 ? (
+                                                <MapLeaflet
+                                                    latShip={latitude}
+                                                    lngShip={longitude}
+                                                    latRes={19.4397}
+                                                    lngRes={111.7009}
+                                                    zoom={15}
+                                                    width="100%"
+                                                    height="100%"
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-full bg-gray-50 text-gray-400 text-sm font-medium">
+                                                    Đang tải vị trí điểm giao...
+                                                </div>
+                                            )
+                                        ) : (
+                                            // Trường hợp mặc định
+                                            <div className="flex items-center justify-center h-full bg-gray-50 text-gray-400 text-sm font-medium">
+                                                Đang tải dữ liệu lộ trình...
+                                            </div>
+                                        )
+                                )
+                            }
                         </div>
                     </div>
 
@@ -196,8 +249,20 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
                 {/* Cột Bên Phải: Trạng Thái Đơn & Chi Tiết Khách (lg:col-span-5) */}
                 <div className="lg:col-span-5 space-y-6">
                     {DeliveriesOrderDetail.length === 0 ? (
-                        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xs text-center text-gray-500 font-medium">
-                            Không có đơn hàng nào
+                        <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xs text-center space-y-3">
+                            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center mx-auto">
+                                <Truck className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-base font-bold text-gray-900">Không có đơn hàng nào đang giao</h3>
+                            <p className="text-xs text-gray-500 max-w-xs mx-auto">
+                                Đơn hàng đã hoàn thành hoặc không tìm thấy. Vui lòng quay lại Bảng điều khiển để nhận đơn mới!
+                            </p>
+                            <Link
+                                href="/shipper/dashboard"
+                                className="inline-block mt-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-xs transition"
+                            >
+                                Về Bảng Điều Khiển
+                            </Link>
                         </div>
                     ) : (
                         DeliveriesOrderDetail.map((item, index) => {
@@ -214,53 +279,47 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
                                                 {item.DeliveryStatus === 'ACCEPTED'
                                                     ? 'Đang Đến Quán'
                                                     : item.DeliveryStatus === 'ARRIVED_AT_STORE'
-                                                    ? 'Đang Lấy Hàng'
-                                                    : item.DeliveryStatus === 'PICKED_UP'
-                                                    ? 'Đang Giao Hàng'
-                                                    : item.DeliveryStatus === 'ARRIVED_AT_BUYER'
-                                                    ? 'Đã Đến Nhà Khách'
-                                                    : item.DeliveryStatus}
+                                                        ? 'Đang Lấy Hàng'
+                                                        : item.DeliveryStatus === 'PICKED_UP'
+                                                            ? 'Đang Giao Hàng'
+                                                            : item.DeliveryStatus === 'ARRIVED_AT_BUYER'
+                                                                ? 'Đã Đến Nhà Khách'
+                                                                : item.DeliveryStatus}
                                             </span>
                                         </div>
 
                                         {/* Step Progress Checklist */}
                                         <div className="space-y-2.5">
-                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${
-                                                ['ARRIVED_AT_STORE', 'PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${['ARRIVED_AT_STORE', 'PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                     ? 'bg-orange-50/60 text-gray-900 border-orange-200'
                                                     : 'bg-gray-50/70 text-gray-400 border-gray-100'
-                                            }`}>
-                                                <span className={`w-2.5 h-2.5 rounded-full ${
-                                                    ['ARRIVED_AT_STORE', 'PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                                }`}>
+                                                <span className={`w-2.5 h-2.5 rounded-full ${['ARRIVED_AT_STORE', 'PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                         ? 'bg-orange-500'
                                                         : 'bg-gray-300'
-                                                }`}></span>
+                                                    }`}></span>
                                                 1. Đã nhận hàng từ nhà hàng
                                             </div>
 
-                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${
-                                                ['PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${['PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                     ? 'bg-orange-50/60 text-gray-900 border-orange-200'
                                                     : 'bg-gray-50/70 text-gray-400 border-gray-100'
-                                            }`}>
-                                                <span className={`w-2.5 h-2.5 rounded-full ${
-                                                    ['PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                                }`}>
+                                                <span className={`w-2.5 h-2.5 rounded-full ${['PICKED_UP', 'ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                         ? 'bg-orange-500'
                                                         : 'bg-gray-300'
-                                                }`}></span>
+                                                    }`}></span>
                                                 2. Đang trên đường đi
                                             </div>
 
-                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${
-                                                ['ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                            <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-3 border transition-all ${['ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                     ? 'bg-orange-50/60 text-gray-900 border-orange-200'
                                                     : 'bg-gray-50/70 text-gray-400 border-gray-100'
-                                            }`}>
-                                                <span className={`w-2.5 h-2.5 rounded-full ${
-                                                    ['ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
+                                                }`}>
+                                                <span className={`w-2.5 h-2.5 rounded-full ${['ARRIVED_AT_BUYER', 'DELIVERED'].includes(item.DeliveryStatus)
                                                         ? 'bg-orange-500'
                                                         : 'bg-gray-300'
-                                                }`}></span>
+                                                    }`}></span>
                                                 3. Đã giao hàng thành công
                                             </div>
                                         </div>

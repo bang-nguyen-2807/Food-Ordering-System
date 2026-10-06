@@ -93,4 +93,31 @@ export class OrderingRepo {
             { name: "OrderId", type: sql.Int, value: OrderId }
         ]);
     }
+    async getLocationRestaurant(OrderId : string){
+        let query = `
+            SELECT R.Latitude as laRes , R.Longitude as lngRes FROM Restaurants as R
+            JOIN Orders AS O
+            ON R.RestaurantId = O.RestaurantId
+            WHERE O.OrderId = @OrderId
+        `
+        return DbHelpQueryRepo.excuteQuery(query, [
+            { name: "OrderId", type: sql.Int, value: OrderId }
+        ]);
+    }
+    async getStatusOrder(OrderId : string , UserId : string){
+        let query = `
+            SELECT DeliveryStatus as StatusOrder FROM Deliveries as D
+            JOIN Orders AS O
+            ON D.OrderId = O.OrderId
+            JOIN Shipper as S
+            ON S.ShipperId = D.ShipperId
+            JOIN Users as U
+            ON U.UserId = S.UserId	
+            WHERE O.OrderId = @OrderId AND U.UserId = @UserId
+        `
+        return DbHelpQueryRepo.excuteQuery(query, [
+            { name: "OrderId", type: sql.Int, value: OrderId },
+            { name: "UserId", type: sql.Int, value: UserId }
+        ]);
+    }
 }

@@ -48,4 +48,29 @@ export class OrderingController {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
         }
     }
+    getLocationRestaurant = async (req : Request , res : Response)=>{
+        try {
+            const OrderId = req.query.OrderId as string;
+            if(!OrderId){
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: "OrderId is required" })
+            }
+            const result = await this.orderingService.getLocationRestaurant(OrderId);
+            return res.status(StatusCodes.OK).json(result);
+        } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
+        }
+    }
+    getStatusOrder = async (req : Request , res : Response)=>{
+        try {
+            const UserId = req.query.UserId as string;
+            const OrderId = req.query.OrderId as string;
+            if(!UserId || !OrderId){
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: "UserId and OrderId are required" })
+            }
+            const result = await this.orderingService.getStatusOrder(OrderId , UserId);
+            return res.status(StatusCodes.OK).json(result);
+        } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" })
+        }
+    }
 }
