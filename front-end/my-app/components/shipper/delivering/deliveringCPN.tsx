@@ -11,6 +11,7 @@ import { Truck, MapPin, Navigation } from "lucide-react";
 import { getDeliveriesOrderDetail, updateNextStatusOrder, getInfoRoute, getLocationRestaurant, getOrderStatus } from "@/features/shipper/delivering/deliveringSlice";
 import LoadingSpinner from "@/components/spinner/loading";
 import ErrorSpinner from "@/components/spinner/error";
+import { GeocodeAddress } from "@/components/map/geocodingUser";
 
 const MapLeaflet = dynamic(
     () => import("@/components/map/mapLeaflet"),
@@ -35,6 +36,7 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
     const { user } = useSelector((state: RootState) => state.login);// get UserId in RTK
     const { DeliveriesOrderDetail, InfoRoute, LocationRestaurant, StatusOrder, loading, error } = useSelector((state: RootState) => state.delivering)
     const UserId = String(user?.UserId || "");
+    const [userLocation , setUserLocation] = useState<{lat : number ; lng : number} | null>(null); // state to save coordinates user
     // get detail data delivery order 
     useEffect(() => {
         dispatch(getDeliveriesOrderDetail({ UserId: UserId, OrderId: String(orderId) })) // chi tiết đơn hàng
@@ -96,7 +98,26 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
             if (watchId !== undefined) navigator.geolocation.clearWatch(watchId);
         };
     }, [UserId]);
-    // get location restaurant 
+    // get location user
+    useEffect(()=>{
+        if(InfoRoute.length > 0 && InfoRoute[0]?.UserAddress){
+            const rawAddress = InfoRoute[0]?.UserAddress;
+            //console.log("[Geocode] Địa chỉ gốc từ DB:", rawAddress);
+            // Thêm ", Việt Nam" nếu chưa có để Nominatim tìm chính xác hơn
+            const addressToSearch = rawAddress.toLowerCase().includes('việt nam') || rawAddress.toLowerCase().includes('vietnam')
+                ? rawAddress
+                : `${rawAddress}, Việt Nam`;
+            //console.log("[Geocode] Địa chỉ gửi lên Nominatim:", addressToSearch);
+            GeocodeAddress(addressToSearch).then((location)=>{
+                console.log("[Geocode] Kết quả trả về:", location);
+                if(location){
+                    setUserLocation(location)
+                } else {
+                    console.warn("[Geocode] Không tìm thấy tọa độ. Kiểm tra lại địa chỉ trong DB:", rawAddress);
+                }
+            })
+        }
+    },[InfoRoute])
     if (loading) {
         return <LoadingSpinner />
     }
@@ -104,7 +125,8 @@ export default function DeliveringCPN({ OrderId }: { OrderId: string }) {
         return <ErrorSpinner message={error} />
     }
     console.log("StatusOrder hiện tại:", StatusOrder[0]);
-console.log("LocationRestaurant hiện tại:", LocationRestaurant);
+    console.log("LocationRestaurant hiện tại:", LocationRestaurant);
+    console.log("vị trí của khách hàng" , InfoRoute[0]?.UserAddress);
     return (
         <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
             {/* Header Trang Đơn Hàng */}
@@ -169,8 +191,8 @@ console.log("LocationRestaurant hiện tại:", LocationRestaurant);
                                                 <MapLeaflet
                                                     latShip={latitude}
                                                     lngShip={longitude}
-                                                    latRes={19.4397}
-                                                    lngRes={111.7009}
+                                                    latRes={userLocation?.lat ?? 0}
+                                                    lngRes={userLocation?.lng ?? 0}
                                                     zoom={15}
                                                     width="100%"
                                                     height="100%"

@@ -98,6 +98,13 @@ export default function MapLeaflet({ latShip, lngShip, latRes, lngRes, zoom, wid
             fetchRoute();
         }
     },[lngShip , latShip , lngRes , latRes])
+    if(loading){
+        return(
+            <div style={{ width: width, height: height }} className="flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                Đang tải đường đi... 
+            </div>
+        )
+    }
 
     return (
         // Đảm bảo thẻ div bọc ngoài có chiều cao cụ thể

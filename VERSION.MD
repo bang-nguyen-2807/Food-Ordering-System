@@ -20,4 +20,7 @@ VERSION 1
                - change status when click button nhận đơn hàng . next status 
     UPDATE 4   - add a function find the way for shipper to restaurant 
                - update click at managerOrder. when click update dbo.deliveries. it will update status 
+    UPDATE 4.1 - create geocoding to get coordinates(tọa độ) user in the shipper by photon
+               - use fallback algorithm to break down the search for address user
+               - update location in deliveringCPN.tsx
                
