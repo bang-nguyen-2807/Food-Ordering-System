@@ -63,13 +63,7 @@ export default function MapLeaflet({ latShip, lngShip, latRes, lngRes, zoom, wid
     const isResValid = typeof latRes === "number" && !isNaN(latRes) && typeof lngRes === "number" && !isNaN(lngRes);
     const [routePoint , setRoutePoint] = useState<[number , number][]>([]); 
     const [loading, setLoading] = useState<boolean>(true); // loading for fetch data
-    if (!isShipValid || !isResValid) {
-        return (
-            <div style={{ width: width, height: height }} className="flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
-                Đang chờ tọa độ hợp lệ...
-            </div>
-        );
-    }
+    
 
     const positionShip: [number, number] = [latShip, lngShip];
     const positionRes: [number, number] = [latRes, lngRes];
@@ -98,6 +92,13 @@ export default function MapLeaflet({ latShip, lngShip, latRes, lngRes, zoom, wid
             fetchRoute();
         }
     },[lngShip , latShip , lngRes , latRes])
+    if (!isShipValid || !isResValid) {
+        return (
+            <div style={{ width: width, height: height }} className="flex items-center justify-center bg-gray-50 text-gray-400 text-sm">
+                Đang chờ tọa độ hợp lệ...
+            </div>
+        );
+    }
     if(loading){
         return(
             <div style={{ width: width, height: height }} className="flex items-center justify-center bg-gray-50 text-gray-400 text-sm">

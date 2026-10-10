@@ -95,4 +95,17 @@ export class InfoUserController{
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "Internal server error"});
         }
     }
+    orderAwaitingShipment = async(req : Request , res : Response) => {
+        try{
+            const UserId = req.query.UserId as string;
+            if(!UserId){
+                return res.status(StatusCodes.BAD_REQUEST).json({message : "Thiếu thông tin"})
+            }
+            const result = await this.infoUserService.orderAwaitingShipment(UserId);
+            return res.status(StatusCodes.OK).json(result);
+        }catch(err){
+            console.log(err);
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({message : "Internal server error"});
+        }
+    }
 }

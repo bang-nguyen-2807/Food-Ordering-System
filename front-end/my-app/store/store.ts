@@ -16,6 +16,7 @@ import homeUserSlice from "../features/users/home/HomeSlice"
 import infoRestaurantSlice from "../features/users/infoRestaurant/infoRestaurantSlice"
 import cartUserSlice from "../features/users/cartUser/cartUserSlice"
 import infoUserSlice from "../features/users/infoUser/infoUserSlice"
+import deliveriesSlice from "../features/users/deliveries/deliveriesSlice"
 export const store = configureStore({
   reducer: {
     login: loginSlice,
@@ -39,6 +40,7 @@ export const store = configureStore({
     infoRestaurant : infoRestaurantSlice,
     cartUser : cartUserSlice,
     infoUser : infoUserSlice,
+    deliveries : deliveriesSlice,
   },
 });
 

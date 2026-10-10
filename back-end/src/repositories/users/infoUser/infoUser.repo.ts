@@ -70,4 +70,17 @@ export class InfoUserRepo {
             { name: "oldPassword", type: sql.NVarChar(200), value: oldPassword }
         ]);
     }
+    async orderAwaitingShipment(UserId : string){ // lấy đơn hàng đg chờ vận chuyển 
+        const query=`
+            SELECT O.OrderId , O.CreatedAt FROM Orders as O
+            JOIN Users as U
+            ON U.UserId = O.UserId 
+            JOIN Deliveries AS D
+            ON D.OrderId = O.OrderId 
+            WHERE U.UserId = @UserId AND D.DeliveryStatus != 'DELIVERED'
+        `
+        return DbHelpQueryRepo.excuteQuery(query, [
+            { name: "UserId", type: sql.Int, value: parseInt(UserId) }
+        ]);
+    }
 }

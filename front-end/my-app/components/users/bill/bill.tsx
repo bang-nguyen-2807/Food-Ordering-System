@@ -191,12 +191,14 @@ export default function Bill({ restaurantId }: { restaurantId: string }) {
 
                     {/* CỤM NÚT ĐIỀU HƯỚNG VÀ IN BILL */}
                     <div className="space-y-2.5 pt-2">
-                        <button 
-                            onClick={() => window.print()}
-                            className="w-full bg-gray-800 hover:bg-black text-white font-bold py-2.5 rounded-lg transition cursor-pointer text-sm"
-                        >
-                            🖨️ In Hóa Đơn
-                        </button>
+                        {billData && (
+                            <button 
+                                onClick={() => router.push(`/users/deliveries/${billData.OrderId}`)}
+                                className="w-full bg-gray-800 hover:bg-black text-white font-bold py-2.5 rounded-lg transition cursor-pointer text-sm"
+                            >
+                                🗺️ Tuyến đường giao hàng
+                            </button>
+                        )}
                         
                         <div className="grid grid-cols-2 gap-3 pt-1">
                             <button 

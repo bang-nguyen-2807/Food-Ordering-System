@@ -8,4 +8,5 @@ router.get("/getInfoUser" , infoUserController.getInfoUser) // get thông tin c�
 router.delete("/deleteAddressUser" , infoUserController.deleteAddressUser) // xóa địa chỉ của user
 router.put("/updateInfoUser" , infoUserController.updateInfoUser) // cập nhật thông tin của user
 router.put("/changePassword" , infoUserController.changePassword) // đổi mật khẩu của user
+router.get("/orderAwaitingShipment" , infoUserController.orderAwaitingShipment) // lấy đơn hàng đg chờ vận chuyển 
 export default router;

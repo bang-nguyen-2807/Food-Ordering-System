@@ -34,4 +34,7 @@ export class InfoUserService{
             success : false
         }
     }
+    async orderAwaitingShipment(UserId : string){
+        return this.infoUserRepo.orderAwaitingShipment(UserId)
+    }
 }

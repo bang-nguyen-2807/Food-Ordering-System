@@ -1,25 +1,28 @@
 "use client"
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAddAddressUser, getInfoUser, getAddressUser, deleteAddressUser, updateInfoUser , changePassword } from "@/features/users/infoUser/infoUserSlice";
+import { fetchAddAddressUser, getInfoUser, getAddressUser, deleteAddressUser, updateInfoUser , changePassword , getOrderAwaitingShipment } from "@/features/users/infoUser/infoUserSlice";
 import { useEffect, useState, useRef } from "react";
 import LoadingSpinner from "@/components/spinner/loading";
 import ErrorSpinner from "@/components/spinner/error";
 import Modal from "@/components/modal/modal";
 
 import Link from "next/link";
-import { User, MapPin, Edit3, Plus, Trash2, Home, Building, Phone, Mail, Lock, Key, ArrowLeft } from "lucide-react";
+import { User, MapPin, Edit3, Plus, Trash2, Home, Building, Phone, Mail, Lock, Key, ArrowLeft, Truck, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function InfoUserCPN() {
     const dispatch = useDispatch<AppDispatch>();
-    const { err, loading, addresses, infoUser } = useSelector((state: RootState) => state.infoUser);
+    const { err, loading, addresses, infoUser , orderAwaitingShipment } = useSelector((state: RootState) => state.infoUser);
     const { user } = useSelector((state: RootState) => state.login);
     const UserId = user?.UserId;
+    const router = useRouter();
 
     // -- Smooth Scroll Refs & Active Tab --
     const infoSectionRef = useRef<HTMLDivElement>(null);
     const addressSectionRef = useRef<HTMLDivElement>(null);
-    const [activeTab, setActiveTab] = useState<"info" | "address">("info");
+    const ordersSectionRef = useRef<HTMLDivElement>(null);
+    const [activeTab, setActiveTab] = useState<"info" | "address" | "orders">("info");
 
     const scrollToInfo = () => {
         setActiveTab("info");
@@ -29,6 +32,11 @@ export default function InfoUserCPN() {
     const scrollToAddress = () => {
         setActiveTab("address");
         addressSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+
+    const scrollToOrders = () => {
+        setActiveTab("orders");
+        ordersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     };
 
     // -- Modal Add Address --
@@ -58,6 +66,7 @@ export default function InfoUserCPN() {
         if (UserId) {
             dispatch(getAddressUser({ UserId: String(UserId) })).unwrap()
             dispatch(getInfoUser({ UserId: String(UserId) })).unwrap()
+            dispatch(getOrderAwaitingShipment({ UserId: String(UserId) })).unwrap()
         }
     }, [UserId]);
     // Open modal add address
@@ -147,14 +156,6 @@ export default function InfoUserCPN() {
             setErrorPassword("Mật khẩu mới không khớp!");
             return;
         }
-        // if(newPassword.length < 6){
-        //     setErrorPassword("Mật khẩu mới phải có ít nhất 6 ký tự");
-        //     return;
-        // }
-        // if(newPassword === oldPassword){
-        //     setErrorPassword("Mật khẩu mới phải khác mật khẩu cũ");
-        //     return;
-        // }
         try{
             await dispatch(changePassword({UserId : String(UserId) , oldPassword : oldPassword , newPassword : newPassword})).unwrap();
             setErrorPassword("Đổi mật khẩu thành công!");
@@ -252,6 +253,25 @@ export default function InfoUserCPN() {
                             </button>
 
                             <button
+                                onClick={scrollToOrders}
+                                className={`flex items-center justify-between p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
+                                    activeTab === "orders"
+                                        ? "bg-orange-50/80 text-orange-600 shadow-2xs"
+                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                                }`}
+                            >
+                                <div className="flex items-center gap-3.5">
+                                    <Truck className={`w-5 h-5 ${activeTab === "orders" ? "text-orange-500" : "text-gray-400"}`} />
+                                    <span>Đơn chờ vận chuyển</span>
+                                </div>
+                                {orderAwaitingShipment.length > 0 && (
+                                    <span className="px-2 py-0.5 text-xs font-bold bg-orange-500 text-white rounded-full">
+                                        {orderAwaitingShipment.length}
+                                    </span>
+                                )}
+                            </button>
+
+                            <button
                                 onClick={scrollToAddress}
                                 className={`flex items-center gap-3.5 p-3.5 rounded-2xl font-bold text-sm transition-all text-left w-full cursor-pointer ${
                                     activeTab === "address"
@@ -319,7 +339,71 @@ export default function InfoUserCPN() {
                         </div>
                     </div>
 
-                    {/* ----- CARD 2: ĐỊA CHỈ ĐÃ LƯU ----- */}
+                    {/* ----- CARD 2: ĐƠN HÀNG ĐANG CHỜ VẬN CHUYỂN ----- */}
+                    <div ref={ordersSectionRef} className="scroll-mt-6 bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-gray-100/80">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <h3 className="text-xl font-bold text-gray-900 tracking-tight">Đơn hàng đang chờ vận chuyển</h3>
+                                {orderAwaitingShipment.length > 0 && (
+                                    <span className="px-3 py-1 bg-orange-50 text-orange-600 text-xs font-bold rounded-full border border-orange-100">
+                                        {orderAwaitingShipment.length} đơn
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Dropdown Select Chọn đơn hàng */}
+                            <div className="w-full sm:w-72">
+                                <select
+                                    onChange={(e) => e.target.value && router.push(`/users/deliveries/${e.target.value}`)}
+                                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-800 bg-gray-50/80 hover:bg-white focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition cursor-pointer"
+                                >
+                                    <option value="">-- Chọn đơn hàng --</option>
+                                    {orderAwaitingShipment.map((item) => (
+                                        <option key={item.OrderId} value={item.OrderId}>
+                                            Mã đơn: PG{item.OrderId} - Ngày mua: {new Date(item.CreatedAt).toLocaleDateString()}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {orderAwaitingShipment.length === 0 ? (
+                            <div className="text-center py-8 border-2 border-dashed border-gray-100 rounded-2xl">
+                                <Truck className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                <p className="text-sm text-gray-400 font-medium">Hiện không có đơn hàng nào đang chờ vận chuyển</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-3">
+                                {orderAwaitingShipment.map((item) => (
+                                    <div
+                                        key={item.OrderId}
+                                        onClick={() => router.push(`/users/deliveries/${item.OrderId}`)}
+                                        className="p-4 sm:p-5 rounded-2xl border border-gray-100 hover:border-orange-200 bg-white hover:bg-orange-50/20 transition-all flex items-center justify-between gap-4 cursor-pointer group"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-11 h-11 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                                                <Truck className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 text-sm sm:text-base">
+                                                    Mã đơn hàng: <span className="text-orange-600">PG{item.OrderId}</span>
+                                                </h4>
+                                                <p className="text-xs text-gray-400 mt-0.5">
+                                                    Ngày mua: {new Date(item.CreatedAt).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs font-semibold text-orange-500 group-hover:translate-x-1 transition-transform">
+                                            <span>Xem chi tiết</span>
+                                            <ChevronRight className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ----- CARD 3: ĐỊA CHỈ ĐÃ LƯU ----- */}
                     <div ref={addressSectionRef} className="scroll-mt-6 bg-white rounded-3xl p-6 sm:p-8 shadow-xs border border-gray-100/80">
                         <div className="flex items-center justify-between gap-4 mb-6">
                             <h3 className="text-xl font-bold text-gray-900 tracking-tight">Địa chỉ đã lưu</h3>
@@ -506,6 +590,7 @@ export default function InfoUserCPN() {
                     </div>
                 </div>
             </Modal>
+
             {/* ---------- MODAL CHANGE PASSWORD ---------- */}
             <Modal
                 isOpen={isOpenModalChangePassword}

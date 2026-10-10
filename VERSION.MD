@@ -23,4 +23,9 @@ VERSION 1
     UPDATE 4.1 - create geocoding to get coordinates(tọa độ) user in the shipper by photon
                - use fallback algorithm to break down the search for address user
                - update location in deliveringCPN.tsx
+    UPDATE 4.2 - update order await shipment in infoUser
+               - add map and geocoding location user and shipper in deliveringCPN.tsx at authorization users
+               - create api and design interface for info shipper receive order and info order items in deliveries.tsx
+               - create api orderAwaitingShipment for get OrderId to get order delivering
+               - geocoding for location shipper to user and finding a way for shipper go to restaurant and user in map 
                

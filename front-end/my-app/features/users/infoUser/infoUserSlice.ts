@@ -20,10 +20,15 @@ export interface changePassword{
     oldPassword : string,
     newPassword : string
 }
+export interface orderAwaitingShipment{
+    OrderId : string,
+    CreatedAt : Date,
+}
 interface InitialState {
     dataUserAddress: InfoAddressUser[],
     addresses: fetchAddressUser[],
     infoUser : InfoUser[],
+    orderAwaitingShipment : orderAwaitingShipment[],
     loading: boolean,
     err: string | null
 }
@@ -31,6 +36,7 @@ const initialState: InitialState = {
     dataUserAddress: [],
     addresses: [],
     infoUser : [],
+    orderAwaitingShipment : [],
     loading: false,
     err: null
 }
@@ -85,6 +91,15 @@ export const changePassword = createAsyncThunk(
             return await otimizeSliceUpdate<changePassword>(`/user/info/changePassword`, thunkAPI, { UserId, oldPassword, newPassword })
         } catch (err: any) {
             return otimizeSliceError(err, thunkAPI, "Không thể đổi mật khẩu")
+        }
+    }
+)
+export const getOrderAwaitingShipment = createAsyncThunk(
+    "infoUserSlice/orderAwaitingShipment", async ({ UserId }: { UserId: string }, thunkAPI) => {
+        try {
+            return await otimizeSliceGET<orderAwaitingShipment[]>(`/user/info/orderAwaitingShipment?UserId=${UserId}`, thunkAPI)
+        } catch (err: any) {
+            return otimizeSliceError(err, thunkAPI, "Không thể lấy đơn hàng đg chờ vận chuyển")
         }
     }
 )
@@ -160,6 +175,18 @@ const infoUserSlice = createSlice({
                 state.loading = false;
             })
             .addCase(changePassword.rejected, (state) => {
+                state.loading = false;
+            })
+            // order awaiting shipment
+            .addCase(getOrderAwaitingShipment.pending, (state) => {
+                state.loading = true;
+                state.err = null;
+            })
+            .addCase(getOrderAwaitingShipment.fulfilled, (state, action) => {
+                state.loading = false;
+                state.orderAwaitingShipment = action.payload;
+            })
+            .addCase(getOrderAwaitingShipment.rejected, (state) => {
                 state.loading = false;
             })
     }
