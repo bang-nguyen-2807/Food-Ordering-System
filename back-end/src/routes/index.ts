@@ -18,6 +18,7 @@ import InfoRestaurantRoutes from "../routes/users/infoRestaurant/infoRestaurant.
 import cartUserRoutes from "../routes/users/cartUser/cartUser.routes"
 import infoUserRoutes from "../routes/users/infoUser/infoUser.route"
 import deliveriesRoutes from "../routes/users/deliveries/deliveries.route"
+import aiChatBoxRoutes from "../routes/users/AI_Chatbot/AI_Chatbot.routes"
 const rootRouter = Router();
 // middleware bảo vệ admin 
 //  ÁP DỤNG MIDDLEWARE BẢO VỆ CHO TOÀN BỘ NHÁNH /admin Ở ĐÂY:
@@ -67,4 +68,5 @@ rootRouter.use("/user/infoRestaurant" , InfoRestaurantRoutes) // trang chi tiế
 rootRouter.use("/user/cart" , cartUserRoutes) // trang giỏ hàng /api/user/cart/addItemsToCart?UserId=1&RestaurantId=1&MenuItemId=1&Quantity=1
 rootRouter.use("/user/info" , infoUserRoutes) // trang thông tin cá nhân /api/user/info/addAddress?UserId=1&AddressName=1&Addresses=1
 rootRouter.use("/user/deliveries" , deliveriesRoutes) // trang giao hàng /api/user/deliveries/getLocationShipperDeliveries?OrderId=1&UserId=1
+rootRouter.use("/user/aiChatBox" , aiChatBoxRoutes) // chat box AI /api/user/aiChatBox/chatBoxAISuggestItemsRestaurant?RestaurantId=1&MessageUser=hello
 export default rootRouter;

@@ -4,16 +4,21 @@ import { useDispatch, useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { fetchInfoRestaurant, fetchListCategoriesRestaurant } from "@/features/users/infoRestaurant/infoRestaurantSlice"
 import { addItemsToCart, deleteItemsFromCart, createOrderAndBill, getItemsToCart } from "@/features/users/cartUser/cartUserSlice"
+import { chatBoxAI } from "@/features/users/chatBotAI/chatBotAISlice"
 import LoadingSpinner from "@/components/spinner/loading"
 import ErrorSpinner from "@/components/spinner/error"
 import { useRouter } from "next/navigation"
+import ModalChatBotAI from "@/components/modal/modalChatBotAI"
 export default function InfoRestaurant({ restaurantId }: { restaurantId: string }) {
     const dispatch = useDispatch<AppDispatch>();
     const { dataRestaurant, dataCategories, loading, err } = useSelector((state: RootState) => state.infoRestaurant);
+    const { resultChatbotAI , loading : loadingChatBotAI } = useSelector((state: RootState) => state.chatBotAI);
     const { items } = useSelector((state: RootState) => state.cartUser);
     const { user } = useSelector((state: RootState) => state.login);
     const UserId = user?.UserId.toString(); // lấy userId
     const [activeCategory, setActiveCategory] = useState<string>("all");
+    const [messageToAI, setMessageToAI] = useState<string>(""); // state để gởi message đến chat bot 
+    const [modalAI, setModalAI] = useState<boolean>(false); // modal cho AI
     const router = useRouter();
     useEffect(() => {
         dispatch(fetchInfoRestaurant({ RestaurantId: restaurantId }))
@@ -53,7 +58,20 @@ export default function InfoRestaurant({ restaurantId }: { restaurantId: string 
             console.log(err)
         }
     }
-    
+    const handleSendMessageToAIChatbot = async(mesage : string)=>{
+        if(!UserId){
+            alert("vui lòng đăng nhập để thực hiện chức năng này!")
+            return
+        }
+        try{
+            console.log("📤 Bắt đầu dispatch...")  // test
+            await dispatch(chatBoxAI({RestaurantId : restaurantId , messageUser : mesage})).unwrap();
+            console.log("✅ Kết quả:", resultChatbotAI)  // test (5s to AI return result)
+            setMessageToAI("")
+        }catch(err){
+            console.log(err)
+        }
+    }
     if (loading) {
         return <LoadingSpinner message="Đang tải thông tin nhà hàng..." />
     }
@@ -214,8 +232,34 @@ export default function InfoRestaurant({ restaurantId }: { restaurantId: string 
                         )}
                     </div>
                 </div>
-
             </div>
+            {/* button AI chatbot */}
+            <button
+                onClick={() => setModalAI(true)}
+                className="fixed bottom-6 right-6 z-50 bg-[#1a1a1a] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#333333] transition-all text-2xl"
+            >
+                🤖
+            </button>
+            <ModalChatBotAI
+                isOpen={modalAI}
+                onClose={() => setModalAI(false)}
+            >
+                <div>
+                    <div className="p-4 h-60 overflow-y-auto bg-gray-50">
+                        {loadingChatBotAI ? (
+                            <p className="text-gray-400 italic text-sm">🤖 Đang suy nghĩ...</p>
+                        ) : resultChatbotAI ? (
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{resultChatbotAI}</p>
+                        ) : (
+                            <p className="text-gray-400 italic text-sm">Hỏi AI về món ăn bạn muốn 🍜</p>
+                        )}
+                    </div>
+                    <div className="p-4">
+                        <input value={messageToAI} onChange={(e) => setMessageToAI(e.target.value)} type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Nhập tin nhắn" />
+                        <button onClick={() => handleSendMessageToAIChatbot(messageToAI)} className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg">Gửi</button>
+                    </div>
+                </div>
+            </ModalChatBotAI>
         </div>
     )
 }

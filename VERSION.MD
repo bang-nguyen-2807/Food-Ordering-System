@@ -28,4 +28,8 @@ VERSION 1
                - create api and design interface for info shipper receive order and info order items in deliveries.tsx
                - create api orderAwaitingShipment for get OrderId to get order delivering
                - geocoding for location shipper to user and finding a way for shipper go to restaurant and user in map 
+    UPDATE 4.3 - create api chatbox with gemini in users
+               - design interface chatbox for user
+               - build function get message from ai with api gemini
+               - build function send message to ai and get message from ai with api gemini
                

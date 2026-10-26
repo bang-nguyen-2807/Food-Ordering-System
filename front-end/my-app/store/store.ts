@@ -17,6 +17,7 @@ import infoRestaurantSlice from "../features/users/infoRestaurant/infoRestaurant
 import cartUserSlice from "../features/users/cartUser/cartUserSlice"
 import infoUserSlice from "../features/users/infoUser/infoUserSlice"
 import deliveriesSlice from "../features/users/deliveries/deliveriesSlice"
+import chatBotAISlice from "../features/users/chatBotAI/chatBotAISlice"
 export const store = configureStore({
   reducer: {
     login: loginSlice,
@@ -41,6 +42,7 @@ export const store = configureStore({
     cartUser : cartUserSlice,
     infoUser : infoUserSlice,
     deliveries : deliveriesSlice,
+    chatBotAI : chatBotAISlice,
   },
 });
 

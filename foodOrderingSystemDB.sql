@@ -165,7 +165,7 @@ CREATE TABLE Cart(
     CartId INT IDENTITY(1,1) PRIMARY KEY,
     UserId INT NOT NULL UNIQUE,
     CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
-    RestaurantId INT not null unique,
+    RestaurantId INT not null,
     FOREIGN KEY (RestaurantId) REFERENCES Restaurants(RestaurantId),
     FOREIGN KEY (UserId) REFERENCES Users(UserId)
 );
