@@ -37,3 +37,4 @@ VERSION 1
                - design interface chatbot in restaurant for manager menu and dashboard
                - build function get message from ai with api gemini in dashboard and managerMenu
                - build function send message to ai and get message from ai with api gemini in dashboard and managerMenu
+    UPDATE 4.5 - add rate limit for all api in backend
