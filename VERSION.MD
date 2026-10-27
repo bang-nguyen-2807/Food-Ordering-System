@@ -32,4 +32,8 @@ VERSION 1
                - design interface chatbox for user
                - build function get message from ai with api gemini
                - build function send message to ai and get message from ai with api gemini
-               
+    UPDATE 4.4 - create api chatbot with gemini in restaurant
+               - fix design interface chatbot in user
+               - design interface chatbot in restaurant for manager menu and dashboard
+               - build function get message from ai with api gemini in dashboard and managerMenu
+               - build function send message to ai and get message from ai with api gemini in dashboard and managerMenu

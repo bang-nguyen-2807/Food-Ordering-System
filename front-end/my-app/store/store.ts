@@ -18,6 +18,7 @@ import cartUserSlice from "../features/users/cartUser/cartUserSlice"
 import infoUserSlice from "../features/users/infoUser/infoUserSlice"
 import deliveriesSlice from "../features/users/deliveries/deliveriesSlice"
 import chatBotAISlice from "../features/users/chatBotAI/chatBotAISlice"
+import chatbotAiSlice from "../features/restaurant/AI_Chatbot/chatbotAISlice";
 export const store = configureStore({
   reducer: {
     login: loginSlice,
@@ -36,6 +37,7 @@ export const store = configureStore({
     dashboardShipper : dashboardShipperSlice,
     navbarShipper : navbarShipperSlice,
     delivering : deliveringSlice,
+    chatbotAi : chatbotAiSlice,
     // user
     homeUser : homeUserSlice,
     infoRestaurant : infoRestaurantSlice,

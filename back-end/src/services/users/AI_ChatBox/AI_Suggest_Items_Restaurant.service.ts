@@ -18,7 +18,7 @@ export class AiSuggestItemsRestaurantService{
         ${menuText}
     `;
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!); // 
-        const modalAI = genAI.getGenerativeModel({model : "gemini-3.5-flash-lite" , systemInstruction: systemPrompt})// systemInstruction giúp AI luôn tuân theo vai trò và quy tắc đã định nghĩa
+        const modalAI = genAI.getGenerativeModel({model : process.env.GEMINI_MODAL!, systemInstruction: systemPrompt})// systemInstruction giúp AI luôn tuân theo vai trò và quy tắc đã định nghĩa
         const result = await modalAI.generateContent(messageUser)
         const responseText = result.response.text();
         return responseText;

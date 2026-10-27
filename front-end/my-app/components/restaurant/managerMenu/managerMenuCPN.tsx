@@ -24,6 +24,8 @@ import {
     Search,
     Utensils
 } from "lucide-react";
+import { ChatbotAISelling } from "@/features/restaurant/AI_Chatbot/chatbotAISlice";
+import ModalChatBotAI from "@/components/modal/modalChatBotAI";
 
 export default function ManagerMenuCPN() {
     const dispatch = useDispatch<AppDispatch>();
@@ -68,6 +70,24 @@ export default function ManagerMenuCPN() {
         Descriptions: "",
         ImageUrl: ""
     });
+    // AI STATE
+    const {resultChatbotAISelling , loading:loadingChatbotAI} = useSelector((state:RootState) => state.chatbotAi);
+    const [messageToAI, setMessageToAI] = useState<string>(""); // state để gởi message đến chat bot 
+    const [modalAI, setModalAI] = useState<boolean>(false); // modal cho AI
+
+    // handle chatbotAI in dashboard
+        const handleSendMessageToAIChatbot = async(message : string)=>{
+            try{
+                if(!UserId){
+                    alert("vui lòng đăng nhập để thực hiện chức năng này!")
+                    return;
+                }
+                await dispatch(ChatbotAISelling({messageUser : message,UserId : String(UserId)})).unwrap();
+                setMessageToAI("");
+            }catch(err){
+                console.log(err)
+            }
+        }
 
     // Load initial data
     useEffect(() => {
@@ -781,6 +801,45 @@ export default function ManagerMenuCPN() {
                     </div>
                 </div>
             )}
+            {/* button AI chatbot */}
+            <button
+                onClick={() => setModalAI(true)}
+                className="fixed bottom-6 right-6 z-50 bg-[#1a1a1a] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#333333] transition-all text-2xl"
+            >
+                🤖
+            </button>
+            <ModalChatBotAI
+                isOpen={modalAI}
+                onClose={() => setModalAI(false)}
+            >
+                <div>
+                    <div className="p-4 h-60 overflow-y-auto bg-gray-50">
+                        {loadingChatbotAI ? (
+                            <p className="text-gray-400 italic text-sm">🤖 Đang suy nghĩ...</p>
+                        ) : resultChatbotAISelling ? (
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{resultChatbotAISelling}</p>
+                        ) : (
+                            <p className="text-gray-400 italic text-sm">Hỏi AI</p>
+                        )}
+                    </div>
+                    <div className="p-4 flex items-center gap-2">
+                        <input
+                            value={messageToAI}
+                            onChange={(e) => setMessageToAI(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSendMessageToAIChatbot(messageToAI)}
+                            type="text"
+                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-gray-500"
+                            placeholder="Nhập tin nhắn..."
+                        />
+                        <button
+                            onClick={() => handleSendMessageToAIChatbot(messageToAI)}
+                            className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-all whitespace-nowrap cursor-pointer"
+                        >
+                            Gửi
+                        </button>
+                    </div>
+                </div>
+            </ModalChatBotAI>
         </div>
     );
 }

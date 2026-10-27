@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import { ShoppingBag, DollarSign, Clock, CheckCircle2, Bell, Utensils, XCircle, AlertCircle, MapPin } from "lucide-react";
 import RestaurantLocation from "@/components/location/restaurant/restaurantLocation";
+import { chatbotAIDashboard } from "@/features/restaurant/AI_Chatbot/chatbotAISlice";
+import ModalChatBotAI from "@/components/modal/modalChatBotAI";
 export default function DashboardCPN() {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.login);
@@ -15,6 +17,10 @@ export default function DashboardCPN() {
     const [latitude, setLatitude] = useState<string>("");
     const [nameLocation, setNameLocation] = useState<string>("");
     const apiKey = process.env.NEXT_PUBLIC_API_KEY as string;
+    // state chatbot
+    const {resultChatbotAI , loading:loadingChatbotAI} = useSelector((state : RootState)=> state.chatbotAi)
+    const [messageToAI, setMessageToAI] = useState<string>(""); // state để gởi message đến chat bot 
+    const [modalAI, setModalAI] = useState<boolean>(false); // modal cho AI
     useEffect(() => {
         if (UserId !== "") {
             dispatch(fetchDashboard(String(UserId))); // fetch info total
@@ -66,6 +72,19 @@ export default function DashboardCPN() {
     useEffect(() => {
         fetchAddress();
     }, [latitude, longitude])
+    // handle chatbotAI in dashboard
+    const handleSendMessageToAIChatbot = async(message : string)=>{
+        try{
+            if(!UserId){
+                alert("vui lòng đăng nhập để thực hiện chức năng này!")
+                return;
+            }
+            await dispatch(chatbotAIDashboard({messageUser : message,UserId : String(UserId)})).unwrap();
+            setMessageToAI("");
+        }catch(err){
+            console.log(err)
+        }
+    }
     if (loading) {
         return <LoadingSpinner message="Loading Dashboard ..." />
     }
@@ -333,6 +352,45 @@ export default function DashboardCPN() {
                     </div>
                 </div>
             </div>
+            {/* button AI chatbot */}
+            <button
+                onClick={() => setModalAI(true)}
+                className="fixed bottom-6 right-6 z-50 bg-[#1a1a1a] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-[#333333] transition-all text-2xl"
+            >
+                🤖
+            </button>
+            <ModalChatBotAI
+                isOpen={modalAI}
+                onClose={() => setModalAI(false)}
+            >
+                <div>
+                    <div className="p-4 h-60 overflow-y-auto bg-gray-50">
+                        {loadingChatbotAI ? (
+                            <p className="text-gray-400 italic text-sm">🤖 Đang suy nghĩ...</p>
+                        ) : resultChatbotAI ? (
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">{resultChatbotAI}</p>
+                        ) : (
+                            <p className="text-gray-400 italic text-sm">Hỏi AI doanh thu</p>
+                        )}
+                    </div>
+                    <div className="p-4 flex items-center gap-2">
+                        <input
+                            value={messageToAI}
+                            onChange={(e) => setMessageToAI(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSendMessageToAIChatbot(messageToAI)}
+                            type="text"
+                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-gray-500"
+                            placeholder="Nhập tin nhắn..."
+                        />
+                        <button
+                            onClick={() => handleSendMessageToAIChatbot(messageToAI)}
+                            className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-all whitespace-nowrap cursor-pointer"
+                        >
+                            Gửi
+                        </button>
+                    </div>
+                </div>
+            </ModalChatBotAI>
         </div>
     );
 }

@@ -254,9 +254,21 @@ export default function InfoRestaurant({ restaurantId }: { restaurantId: string 
                             <p className="text-gray-400 italic text-sm">Hỏi AI về món ăn bạn muốn 🍜</p>
                         )}
                     </div>
-                    <div className="p-4">
-                        <input value={messageToAI} onChange={(e) => setMessageToAI(e.target.value)} type="text" className="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Nhập tin nhắn" />
-                        <button onClick={() => handleSendMessageToAIChatbot(messageToAI)} className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg">Gửi</button>
+                    <div className="p-4 flex items-center gap-2">
+                        <input
+                            value={messageToAI}
+                            onChange={(e) => setMessageToAI(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleSendMessageToAIChatbot(messageToAI)}
+                            type="text"
+                            className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-gray-500"
+                            placeholder="Nhập tin nhắn..."
+                        />
+                        <button
+                            onClick={() => handleSendMessageToAIChatbot(messageToAI)}
+                            className="bg-[#1a1a1a] text-white px-4 py-2 rounded-lg hover:bg-[#333333] transition-all whitespace-nowrap cursor-pointer"
+                        >
+                            Gửi
+                        </button>
                     </div>
                 </div>
             </ModalChatBotAI>

@@ -10,6 +10,8 @@ import AdminAnalyticsRoutes from "../routes/admin/analytics/Admin.Analytics.rout
 import DashboardRoutes from "../routes/restaurant/dashboard/dashboard.routes"
 import ManagerOrderRoutes from "../routes/restaurant/managerOrder/managerOrder.routes"
 import ManagerMenuRoutes from "../routes/restaurant/managerMenu/managerMenu.routes"
+import chatbotDashboardRoutes from "../routes/restaurant/AI_Chatbot/dashboard/chatbotDashboard.routes"
+import chatbotManagerMenuRoutes from "../routes/restaurant/AI_Chatbot/managerMenu/chatbotManagerMenu.routes"
 import shipperDashboardRoutes from "../routes/shiper/dashboard/dashboard.routes"
 import OrderingRoutes from "../routes/shiper/ordering/ordering.routes"
 import shipperNavbarRoutes from "../routes/shiper/navbar/navbar.routes"
@@ -58,6 +60,8 @@ rootRouter.use("/admin/analytics" , AdminAnalyticsRoutes) // thống kê doanh t
 rootRouter.use("/restaurant/dashboard" , DashboardRoutes) // thống kê doanh thu 
 rootRouter.use("/restaurant/managerOrder" , ManagerOrderRoutes)
 rootRouter.use("/restaurant/managerMenu" , ManagerMenuRoutes)
+rootRouter.use("/restaurant/chatbot" , chatbotDashboardRoutes) // chat box AI /api/restaurant/chatbot/revenue-dashboard-chatbot
+rootRouter.use("/restaurant/chatbot" , chatbotManagerMenuRoutes) // chat box AI /api/restaurant/chatbot/ChatbotSelling
 // shipper
 rootRouter.use("/shipper/dashboard" , shipperDashboardRoutes)
 rootRouter.use("/shipper/ordering" , OrderingRoutes) // giao hàng của shipper
