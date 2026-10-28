@@ -2,14 +2,14 @@ import { Request } from "express";
 import sql from "mssql";
 import { StatusCodes } from "http-status-codes";
 import { connnectDB } from "../../../config/database";
-
+import bcrypt from "bcrypt";
 export class CreateAccountRepo {
   async createAccount(req: Request) {
     try {
       const body = req.body;
       const { username, password, fullName, numberPhone, email, systemRole } = body;
 
-      // 1. Kiểm tra dữ liệu đầu vào
+      //  Kiểm tra dữ liệu đầu vào
       if (!username || !password || !fullName || !numberPhone || !email || !systemRole) {
         return {
           status: StatusCodes.BAD_REQUEST,
@@ -40,10 +40,11 @@ export class CreateAccountRepo {
           message: "Mật khẩu phải có ít nhất 3 kí tự!",
         };
       }
+      const hashedPassword = await bcrypt.hash(password , 10); // hash password với saltRounds = 10
 
       const pool = await connnectDB();
 
-      // 2. Chèn vào bảng Users và lấy ra UserId vừa tạo
+      //  Chèn vào bảng Users và lấy ra UserId vừa tạo
       const queryInsertUser = `
         INSERT INTO Users (
             FullName,
@@ -61,7 +62,7 @@ export class CreateAccountRepo {
         .request()
         .input("fullName", sql.NVarChar(255), fullName)
         .input("username", sql.VarChar(90), username)
-        .input("password", sql.VarChar(255), password)
+        .input("password", sql.VarChar(255), hashedPassword) // chèn hashPashword vào db chứ k truyền passwork người dùng nhập nx
         .input("numberPhone", sql.VarChar(20), numberPhone)
         .input("email", sql.VarChar(255), email)
         .input("systemRole", sql.NVarChar(30), roleUpper)
@@ -69,7 +70,7 @@ export class CreateAccountRepo {
 
       const newUserId = result.recordset?.[0]?.UserId;
 
-      // 3. Nếu là SHIPPER -> tự động tạo bản ghi trong bảng Shipper
+      //  Nếu là SHIPPER -> tự động tạo bản ghi trong bảng Shipper
       if (roleUpper === "SHIPPER" && newUserId) {
         await pool
           .request()

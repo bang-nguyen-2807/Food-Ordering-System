@@ -38,3 +38,6 @@ VERSION 1
                - build function get message from ai with api gemini in dashboard and managerMenu
                - build function send message to ai and get message from ai with api gemini in dashboard and managerMenu
     UPDATE 4.5 - add rate limit for all api in backend
+    UPDATE 4.6 - download library bcrypt for hash password for user
+               - update login repo and createAccount repo for hash password for user
+               - write README.md to clone this project very detail
